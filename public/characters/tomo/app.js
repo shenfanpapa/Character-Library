@@ -1,4 +1,4 @@
-import {createPosePlayer} from '../../motion/pose-player.js';
+import {createPosePlayer} from '../_shared/pose-player.js';
 window.posePlayer=createPosePlayer({
 views:["portrait", "keys"],layers:["base", "skirt"],skirtStart:0.45,baseCenter:0.17,
 textSelectors:'.eyebrow,h2,.detail-group p',labels:['切换到第二个姿态；长按暂停动态','切换到第一个姿态；长按暂停动态'],
