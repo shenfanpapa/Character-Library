@@ -21,9 +21,9 @@
     stats.geometryFrames++;
     g.clearRect(0,0,width,height);const w=width,h=height,mobile=w<=700;
     g.fillStyle='#ffde35';g.fillRect(0,0,w,h);
-    const edge=Math.min(2,Math.floor(p)),local=p-edge,hoverX=state.px*12,hoverY=state.py*9;
+    const edge=Math.min(2,Math.floor(p)),local=p-edge;
     // Main color field opens as a circle and folds into a clean octagonal frame.
-    const cx=phase(p,mobile?.72:.79,mobile?.22:.24,.75,0,.65)*w+hoverX,cy=phase(p,.46,.53,.56,0,.65)*h+hoverY;
+    const cx=phase(p,mobile?.72:.79,mobile?.22:.24,.75,0,.65)*w,cy=phase(p,.46,.53,.56,0,.65)*h;
     const radius=(mobile?.68:.43)*Math.max(w,mobile?w:h);
     const ring=Array.from({length:48},(_,i)=>{const a=i*Math.PI*2/48;const sector=Math.PI/4;const corner=((a+sector/2)%sector)-sector/2;const polyR=Math.cos(sector/2)/Math.cos(corner);const rr=radius*phase(p,1,polyR,i%4===0?1.22:.94,0,.65);return[cx+Math.cos(a)*rr,cy+Math.sin(a)*rr];});
     polygon(ring,'#f9088a');
@@ -35,11 +35,11 @@
     g.save();g.beginPath();ring.forEach((pt,i)=>i?g.lineTo(...pt):g.moveTo(...pt));g.closePath();g.clip();g.fillStyle=dotPattern;g.globalAlpha=.14;g.fillRect(0,35,w,h-35);g.restore();
     // Six solid paper shards unfold into an offset rosette in a staged sequence.
     const rx=phase(p,.84,.20,.78,.22,.95)*w,ry=phase(p,.43,.49,.47,.22,.95)*h;
-    for(let i=0;i<6;i++){const begin=.10+i*.055,end=.54+i*.055;const angle=phase(p,-1.1+i*.14,i*Math.PI/3-.5,i*Math.PI/3+.25,begin,end);const length=(mobile?38:62)+i*3;const dist=phase(p,110,155,220,begin,end)*(mobile?.61:1);const x=rx+Math.cos(angle)*dist+hoverX,y=ry+Math.sin(angle)*dist+hoverY;g.save();g.translate(x,y);g.rotate(phase(p,-.3,i*.3,angle+.7,begin,end));polygon([[0,-length],[length*.38,0],[0,length],[-length*.17,0]],i%2?'#ffde35':'#81e5c5');g.restore();}
+    for(let i=0;i<6;i++){const begin=.10+i*.055,end=.54+i*.055;const angle=phase(p,-1.1+i*.14,i*Math.PI/3-.5,i*Math.PI/3+.25,begin,end);const length=(mobile?38:62)+i*3;const dist=phase(p,110,155,220,begin,end)*(mobile?.61:1);const x=rx+Math.cos(angle)*dist,y=ry+Math.sin(angle)*dist;g.save();g.translate(x,y);g.rotate(phase(p,-.3,i*.3,angle+.7,begin,end));polygon([[0,-length],[length*.38,0],[0,length],[-length*.17,0]],i%2?'#ffde35':'#81e5c5');g.restore();}
     // Separate wire rings and diagonal hatching provide a second scale of motion.
     g.save();g.translate(phase(p,.75,.22,.79,.3,.9)*w,phase(p,.49,.51,.54,.3,.9)*h);g.rotate(phase(p,-.2,.2,.5,.3,.9));g.strokeStyle='#302240';g.lineWidth=1.4;g.beginPath();g.ellipse(0,0,mobile?w*.42:w*.26,h*.43,0,.25,Math.PI*1.8);g.stroke();g.restore();
     const accents=[{a:[.44,.18],b:[.83,.18],r:25,c:'#e73745',n:8,inner:.28},{a:[.91,.76],b:[.43,.79],r:20,c:'#81e5c5',n:4,inner:1},{a:[.41,.75],b:[.07,.21],r:14,c:'#302240',n:4,inner:1}];
-    accents.forEach((o,i)=>{const s=mobile?.7:1;const x=phase(p,o.a[0],o.b[0],.50+i*.13,.15+i*.11,.60+i*.11)*w+hoverX*(i+1)*.3,y=phase(p,o.a[1],o.b[1],.14+i*.29,.15+i*.11,.60+i*.11)*h+hoverY;polygon(radial(x,y,o.r*s,o.n,phase(p,0,Math.PI/2,Math.PI,.15+i*.11,.60+i*.11),o.inner),o.c);});
+    accents.forEach((o,i)=>{const s=mobile?.7:1;const x=phase(p,o.a[0],o.b[0],.50+i*.13,.15+i*.11,.60+i*.11)*w,y=phase(p,o.a[1],o.b[1],.14+i*.29,.15+i*.11,.60+i*.11)*h;polygon(radial(x,y,o.r*s,o.n,phase(p,0,Math.PI/2,Math.PI,.15+i*.11,.60+i*.11),o.inner),o.c);});
     g.save();g.translate(phase(p,.91,.08,.91,0,.65)*w,.17*h);g.rotate(phase(p,.3,-.3,.7,0,.65));g.strokeStyle='#302240';g.lineWidth=2;for(let i=0;i<5;i++){g.beginPath();g.moveTo(i*9,0);g.lineTo(i*9-20,35);g.stroke();}g.restore();
   }
   function layout(p){
@@ -58,7 +58,7 @@
   function beginTransition(){state.preparing=false;$('loadingNote').hidden=true;state.from=state.p;state.target=Math.floor(state.p)+1;state.start=performance.now();state.duration=reduced.matches?1:2200;state.moving=true;scene.setAttribute('aria-busy','true');scene.dataset.phase='transition';wake();}
   function switchView(){if(!state.ready)return;if(state.moving||state.preparing){state.pending=true;return;}if(renderer.prepare){state.preparing=true;scene.setAttribute('aria-busy','true');$('loadingNote').textContent='Preparing the next pose…';$('loadingNote').hidden=false;renderer.prepare(Math.floor(state.p)).then(beginTransition).catch(error=>{state.preparing=false;state.pending=false;scene.setAttribute('aria-busy','false');$('loadingNote').textContent='Could not load the next pose. Tap to retry.';console.error(error);});}else beginTransition();}
   function pause(){state.paused=!state.paused;scene.dataset.motion=state.paused?'paused':'playing';$('hint').textContent=state.paused?'MOTION PAUSED · PRESS P TO RESUME':'TAP ANYWHERE TO REFRAME';$('liveStatus').textContent=state.paused?'Ambient motion paused.':'Ambient motion resumed.';wake();}
-  function tick(now){raf=0;if(now-lastDraw<15.7){raf=requestAnimationFrame(tick);return;}lastDraw=now;const dt=Math.min(.05,(now-(state.last||now))/1000);state.last=now;if(!state.paused&&!reduced.matches)state.time+=dt;state.px=Math.abs(state.px-state.x)<.001?state.x:mix(state.px,state.x,.22);state.py=Math.abs(state.py-state.y)<.001?state.y:mix(state.py,state.y,.22);
+  function tick(now){raf=0;if(now-lastDraw<15.7){raf=requestAnimationFrame(tick);return;}lastDraw=now;const dt=Math.min(.05,(now-(state.last||now))/1000);state.last=now;if(!state.paused&&!reduced.matches)state.time+=dt;state.px=Math.abs(state.px-state.x)<.001?state.x:mix(state.px,state.x,.22);state.py=Math.abs(state.py-state.y)<.001?state.y:mix(state.py,state.y,.22);scene.style.setProperty('--hx',(state.px*26).toFixed(2)+'px');scene.style.setProperty('--hy',(state.py*20).toFixed(2)+'px');scene.style.setProperty('--hrx',(-state.py*11).toFixed(2)+'deg');scene.style.setProperty('--hry',(state.px*11).toFixed(2)+'deg');
     if(state.moving){const f=clamp((now-state.start)/state.duration);state.p=mix(state.from,state.target,smooth(f));if(f===1){state.moving=false;state.p=state.target%3;scene.dataset.phase='idle';scene.setAttribute('aria-busy','false');scene.setAttribute('aria-label',`Teru in ${views[state.p].name}. Activate to change to ${views[(state.p+1)%3].name}. Press P to pause motion.`);$('liveStatus').textContent=views[state.p].name;if(state.pending){state.pending=false;switchView();}}}
     if(state.p!==lastGeoP||state.px!==lastGeoX||state.py!==lastGeoY){geometry(state.p,state.time);lastGeoP=state.p;lastGeoX=state.px;lastGeoY=state.py;}layout(state.p);if(renderer){const edge=Math.min(2,Math.floor(state.p));renderer.draw(edge,segment(state.p-edge,.12,.9),state.time,reduced.matches?0:1);stats.characterFrames++;}
     if(!raf&&!document.hidden&&(!state.paused&&!reduced.matches||state.moving||Math.abs(state.px-state.x)>.001||Math.abs(state.py-state.y)>.001))raf=requestAnimationFrame(tick);

@@ -1,7 +1,7 @@
 'use strict';
 (()=>{
  const stage=document.getElementById('stage'),toggle=document.getElementById('sceneToggle'),dossier=document.getElementById('dossier'),status=document.getElementById('assetStatus'),art=document.getElementById('characterArt'),reduced=matchMedia('(prefers-reduced-motion: reduce)');
- let open=false,down=null,drag=false,raf=0,userPaused=false;
+ let open=false,down=null,drag=false,userPaused=false;
  const motion={ 'hair-left':{sway:1.5,duration:5.8},'hair-right':{sway:1.6,duration:6.5},'cloth-left':{sway:2.4,duration:7.2},'cloth-right':{sway:2.2,duration:7.9} };
  const updatePause=()=>stage.classList.toggle('is-paused',userPaused||document.hidden);
  function setOpen(value){
@@ -16,10 +16,13 @@
  toggle.addEventListener('click',()=>{if(!drag)setOpen(!open);drag=false});
  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&open)setOpen(false);if(e.key.toLowerCase()==='p'&&!e.repeat){userPaused=!userPaused;updatePause()}});
  document.addEventListener('visibilitychange',updatePause);
- stage.addEventListener('pointermove',e=>{if(e.pointerType==='touch'||reduced.matches||open||raf)return;const x=e.clientX,y=e.clientY;raf=requestAnimationFrame(()=>{const r=stage.getBoundingClientRect();stage.style.setProperty('--px',((x-r.left)/r.width-.5)*15+'px');stage.style.setProperty('--py',((y-r.top)/r.height-.5)*12+'px');raf=0})});
- stage.addEventListener('pointerleave',()=>{stage.style.setProperty('--px','0px');stage.style.setProperty('--py','0px')});
+ let tx=0,ty=0,trx=0,try_=0,cx=0,cy=0,crx=0,cry=0,tiltLoopOn=false;
+ function setStageTilt(nx,ny){tx=nx*16;ty=ny*13;trx=-ny*9;try_=nx*9;if(!tiltLoopOn){tiltLoopOn=true;requestAnimationFrame(stageTiltStep)}}
+ function stageTiltStep(){cx+=(tx-cx)*.15;cy+=(ty-cy)*.15;crx+=(trx-crx)*.15;cry+=(try_-cry)*.15;stage.style.setProperty('--px',cx.toFixed(2)+'px');stage.style.setProperty('--py',cy.toFixed(2)+'px');stage.style.setProperty('--prx',crx.toFixed(2)+'deg');stage.style.setProperty('--pry',cry.toFixed(2)+'deg');if(Math.abs(tx-cx)>.03||Math.abs(ty-cy)>.03||Math.abs(trx-crx)>.02||Math.abs(try_-cry)>.02)requestAnimationFrame(stageTiltStep);else tiltLoopOn=false}
+ stage.addEventListener('pointermove',e=>{if(e.pointerType==='touch'||reduced.matches||open)return;const r=stage.getBoundingClientRect();setStageTilt(((e.clientX-r.left)/r.width-.5)*2,((e.clientY-r.top)/r.height-.5)*2)});
+ stage.addEventListener('pointerleave',()=>setStageTilt(0,0));
  let tiltBase=null,tiltRaf=0;
- function applyTilt(beta,gamma){if(reduced.matches||open)return;if(tiltBase===null)tiltBase=beta||0;const gx=Math.max(-24,Math.min(24,gamma||0)),by=Math.max(-24,Math.min(24,(beta||0)-tiltBase));stage.style.setProperty('--px',(gx*.5).toFixed(1)+'px');stage.style.setProperty('--py',(by*.42).toFixed(1)+'px')}
+ function applyTilt(beta,gamma){if(reduced.matches||open)return;if(tiltBase===null)tiltBase=beta||0;const nx=Math.max(-1,Math.min(1,(gamma||0)/24)),ny=Math.max(-1,Math.min(1,((beta||0)-tiltBase)/24));setStageTilt(nx,ny)}
  if('DeviceOrientationEvent' in window)document.addEventListener('touchstart',function start(){document.removeEventListener('touchstart',start);const attach=()=>window.addEventListener('deviceorientation',e=>{if(tiltRaf)return;tiltRaf=requestAnimationFrame(()=>{applyTilt(e.beta,e.gamma);tiltRaf=0})});if(typeof DeviceOrientationEvent.requestPermission==='function'){DeviceOrientationEvent.requestPermission().then(state=>{if(state==='granted')attach()}).catch(()=>{})}else attach()},{passive:true});
  let frame=null,manifest=null;
  function resize(){if(frame&&manifest){const r=art.getBoundingClientRect(),w=manifest.width,h=manifest.height,scale=Math.min(r.width/w,r.height/h);frame.style.width=(w*scale)+'px';frame.style.height=(h*scale)+'px'}if(open){stage.style.minHeight=(innerWidth<=700?Math.max(1300,680+dossier.scrollHeight+105):Math.max(780,Math.ceil((dossier.scrollHeight+100)/.68)))+'px'}else stage.style.minHeight=''}

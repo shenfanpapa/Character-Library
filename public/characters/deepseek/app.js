@@ -22,11 +22,14 @@ scene.addEventListener('pointerdown',e=>{if(e.target.closest('a'))return;press={
 scene.addEventListener('pointercancel',()=>press=null);
 scene.addEventListener('pointerup',e=>{if(press&&performance.now()-press.at>=650&&Math.hypot(e.clientX-press.x,e.clientY-press.y)<12){suppressClickUntil=performance.now()+400;toggleMotion();}press=null;});
 scene.addEventListener('keydown',e=>{if(e.target!==scene||e.repeat)return;if(e.key==='Enter'||e.key===' '){e.preventDefault();toggle();}else if(e.key.toLowerCase()==='p'){toggleMotion();}});
-const poseWindow=document.getElementById('poseWindow');let hoverRaf=0;
-scene.addEventListener('pointermove',e=>{if(e.pointerType==='touch'||isReduced()||hoverRaf)return;const x=e.clientX,y=e.clientY;hoverRaf=requestAnimationFrame(()=>{const r=scene.getBoundingClientRect();poseWindow.style.setProperty('--hx',((x-r.left)/r.width-.5)*30+'px');poseWindow.style.setProperty('--hy',((y-r.top)/r.height-.5)*22+'px');hoverRaf=0;});});
-scene.addEventListener('pointerleave',()=>{poseWindow.style.setProperty('--hx','0px');poseWindow.style.setProperty('--hy','0px');});
+const poseWindow=document.getElementById('poseWindow');
+let htx=0,hty=0,htrx=0,htry=0,hcx=0,hcy=0,hcrx=0,hcry=0,hoverLoopOn=false;
+function setHoverTilt(nx,ny){htx=nx*26;hty=ny*20;htrx=-ny*11;htry=nx*11;if(!hoverLoopOn){hoverLoopOn=true;requestAnimationFrame(hoverTiltStep)}}
+function hoverTiltStep(){hcx+=(htx-hcx)*.15;hcy+=(hty-hcy)*.15;hcrx+=(htrx-hcrx)*.15;hcry+=(htry-hcry)*.15;poseWindow.style.setProperty('--hx',hcx.toFixed(2)+'px');poseWindow.style.setProperty('--hy',hcy.toFixed(2)+'px');poseWindow.style.setProperty('--hrx',hcrx.toFixed(2)+'deg');poseWindow.style.setProperty('--hry',hcry.toFixed(2)+'deg');if(Math.abs(htx-hcx)>.03||Math.abs(hty-hcy)>.03||Math.abs(htrx-hcrx)>.02||Math.abs(htry-hcry)>.02)requestAnimationFrame(hoverTiltStep);else hoverLoopOn=false}
+scene.addEventListener('pointermove',e=>{if(e.pointerType==='touch'||isReduced())return;const r=scene.getBoundingClientRect();setHoverTilt(((e.clientX-r.left)/r.width-.5)*2,((e.clientY-r.top)/r.height-.5)*2);});
+scene.addEventListener('pointerleave',()=>setHoverTilt(0,0));
 let tiltBase=null,tiltRaf=0;
-function applyTilt(beta,gamma){if(isReduced())return;if(tiltBase===null)tiltBase=beta||0;const gx=Math.max(-24,Math.min(24,gamma||0)),by=Math.max(-24,Math.min(24,(beta||0)-tiltBase));poseWindow.style.setProperty('--hx',(gx*1.15).toFixed(1)+'px');poseWindow.style.setProperty('--hy',(by*.95).toFixed(1)+'px');}
+function applyTilt(beta,gamma){if(isReduced())return;if(tiltBase===null)tiltBase=beta||0;const nx=Math.max(-1,Math.min(1,(gamma||0)/24)),ny=Math.max(-1,Math.min(1,((beta||0)-tiltBase)/24));setHoverTilt(nx,ny);}
 if('DeviceOrientationEvent' in window)document.addEventListener('touchstart',function start(){document.removeEventListener('touchstart',start);const attach=()=>window.addEventListener('deviceorientation',e=>{if(tiltRaf)return;tiltRaf=requestAnimationFrame(()=>{applyTilt(e.beta,e.gamma);tiltRaf=0;});});if(typeof DeviceOrientationEvent.requestPermission==='function'){DeviceOrientationEvent.requestPermission().then(perm=>{if(perm==='granted')attach();}).catch(()=>{});}else attach();},{passive:true});
 reduced.addEventListener('change',e=>{motionOverride=false;delete scene.dataset.motionOverride;paused=e.matches;if(e.matches)instant();motionHint();dirty=true;});
 document.addEventListener('visibilitychange',()=>{last=null;dirty=true;});updateContent(0);motionHint();

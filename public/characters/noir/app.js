@@ -20,11 +20,14 @@ let touchStart=null,scrollGesture=false;scene.addEventListener('pointerdown',e=>
 scene.addEventListener('click',event=>{if(scrollGesture){scrollGesture=false;return;}if(!event.target.closest('a')&&!window.getSelection()?.toString())switchLayout();});
 scene.addEventListener('keydown',event=>{if(event.target!==scene||event.repeat)return;if(event.key==='Enter'||event.key===' '){event.preventDefault();switchLayout();}else if(event.key.toLowerCase()==='p'){setPause(!paused);document.getElementById('announcement').textContent=paused?'Clothing motion paused':'Clothing motion resumed';}});
 reduced.addEventListener('change',event=>setPause(event.matches));setPause(paused);
-const characterEl=document.querySelector('.character');let hoverRaf=0;
-scene.addEventListener('pointermove',e=>{if(e.pointerType==='touch'||reduced.matches||hoverRaf)return;const x=e.clientX,y=e.clientY;hoverRaf=requestAnimationFrame(()=>{const r=scene.getBoundingClientRect();characterEl.style.setProperty('--hx',((x-r.left)/r.width-.5)*30+'px');characterEl.style.setProperty('--hy',((y-r.top)/r.height-.5)*22+'px');hoverRaf=0;});});
-scene.addEventListener('pointerleave',()=>{characterEl.style.setProperty('--hx','0px');characterEl.style.setProperty('--hy','0px');});
+const characterEl=document.querySelector('.character');
+let htx=0,hty=0,htrx=0,htry=0,hcx=0,hcy=0,hcrx=0,hcry=0,hoverLoopOn=false;
+function setHoverTilt(nx,ny){htx=nx*26;hty=ny*20;htrx=-ny*11;htry=nx*11;if(!hoverLoopOn){hoverLoopOn=true;requestAnimationFrame(hoverTiltStep)}}
+function hoverTiltStep(){hcx+=(htx-hcx)*.15;hcy+=(hty-hcy)*.15;hcrx+=(htrx-hcrx)*.15;hcry+=(htry-hcry)*.15;characterEl.style.setProperty('--hx',hcx.toFixed(2)+'px');characterEl.style.setProperty('--hy',hcy.toFixed(2)+'px');characterEl.style.setProperty('--hrx',hcrx.toFixed(2)+'deg');characterEl.style.setProperty('--hry',hcry.toFixed(2)+'deg');if(Math.abs(htx-hcx)>.03||Math.abs(hty-hcy)>.03||Math.abs(htrx-hcrx)>.02||Math.abs(htry-hcry)>.02)requestAnimationFrame(hoverTiltStep);else hoverLoopOn=false}
+scene.addEventListener('pointermove',e=>{if(e.pointerType==='touch'||reduced.matches)return;const r=scene.getBoundingClientRect();setHoverTilt(((e.clientX-r.left)/r.width-.5)*2,((e.clientY-r.top)/r.height-.5)*2);});
+scene.addEventListener('pointerleave',()=>setHoverTilt(0,0));
 let tiltBase=null,tiltRaf=0;
-function applyTilt(beta,gamma){if(reduced.matches)return;if(tiltBase===null)tiltBase=beta||0;const gx=Math.max(-24,Math.min(24,gamma||0)),by=Math.max(-24,Math.min(24,(beta||0)-tiltBase));characterEl.style.setProperty('--hx',(gx*1.15).toFixed(1)+'px');characterEl.style.setProperty('--hy',(by*.95).toFixed(1)+'px');}
+function applyTilt(beta,gamma){if(reduced.matches)return;if(tiltBase===null)tiltBase=beta||0;const nx=Math.max(-1,Math.min(1,(gamma||0)/24)),ny=Math.max(-1,Math.min(1,((beta||0)-tiltBase)/24));setHoverTilt(nx,ny);}
 if('DeviceOrientationEvent' in window)document.addEventListener('touchstart',function start(){document.removeEventListener('touchstart',start);const attach=()=>window.addEventListener('deviceorientation',e=>{if(tiltRaf)return;tiltRaf=requestAnimationFrame(()=>{applyTilt(e.beta,e.gamma);tiltRaf=0;});});if(typeof DeviceOrientationEvent.requestPermission==='function'){DeviceOrientationEvent.requestPermission().then(perm=>{if(perm==='granted')attach();}).catch(()=>{});}else attach();},{passive:true});
 // Shared continuous mesh pins the seams of separately extracted RGBA parts.
 // Local displacement fields give hair locks, sleeves, skirt and bow different phases.
