@@ -22,15 +22,6 @@ scene.addEventListener('pointerdown',e=>{if(e.target.closest('a'))return;press={
 scene.addEventListener('pointercancel',()=>press=null);
 scene.addEventListener('pointerup',e=>{if(press&&performance.now()-press.at>=650&&Math.hypot(e.clientX-press.x,e.clientY-press.y)<12){suppressClickUntil=performance.now()+400;toggleMotion();}press=null;});
 scene.addEventListener('keydown',e=>{if(e.target!==scene||e.repeat)return;if(e.key==='Enter'||e.key===' '){e.preventDefault();toggle();}else if(e.key.toLowerCase()==='p'){toggleMotion();}});
-const poseWindow=document.getElementById('poseWindow');
-let htx=0,hty=0,hcx=0,hcy=0,hvx=0,hvy=0,hoverLoopOn=false;
-function setHoverTilt(nx,ny){htx=nx*26;hty=ny*20;if(!hoverLoopOn){hoverLoopOn=true;requestAnimationFrame(hoverTiltStep)}}
-function hoverTiltStep(){hvx=(hvx+(htx-hcx)*.12)*.82;hcx+=hvx;hvy=(hvy+(hty-hcy)*.12)*.82;hcy+=hvy;poseWindow.style.setProperty('--hx',hcx.toFixed(2)+'px');poseWindow.style.setProperty('--hy',hcy.toFixed(2)+'px');if(Math.abs(htx-hcx)>.03||Math.abs(hvx)>.03||Math.abs(hty-hcy)>.03||Math.abs(hvy)>.03)requestAnimationFrame(hoverTiltStep);else hoverLoopOn=false}
-scene.addEventListener('pointermove',e=>{if(e.pointerType==='touch'||isReduced())return;const r=scene.getBoundingClientRect();setHoverTilt(((e.clientX-r.left)/r.width-.5)*2,((e.clientY-r.top)/r.height-.5)*2);});
-scene.addEventListener('pointerleave',()=>setHoverTilt(0,0));
-let tiltBase=null,tiltRaf=0;
-function applyTilt(beta,gamma){if(isReduced())return;if(tiltBase===null)tiltBase=beta||0;const nx=Math.max(-1,Math.min(1,(gamma||0)/24)),ny=Math.max(-1,Math.min(1,((beta||0)-tiltBase)/24));setHoverTilt(nx,ny);}
-if('DeviceOrientationEvent' in window)document.addEventListener('touchstart',function start(){document.removeEventListener('touchstart',start);const attach=()=>window.addEventListener('deviceorientation',e=>{if(tiltRaf)return;tiltRaf=requestAnimationFrame(()=>{applyTilt(e.beta,e.gamma);tiltRaf=0;});});if(typeof DeviceOrientationEvent.requestPermission==='function'){DeviceOrientationEvent.requestPermission().then(perm=>{if(perm==='granted')attach();}).catch(()=>{});}else attach();},{passive:true});
 reduced.addEventListener('change',e=>{motionOverride=false;delete scene.dataset.motionOverride;paused=e.matches;if(e.matches)instant();motionHint();dirty=true;});
 document.addEventListener('visibilitychange',()=>{last=null;dirty=true;});updateContent(0);motionHint();
 function tick(now){const dt=last===null?0:Math.min(.1,(now-last)/1000);last=now;if(!document.hidden){if(!paused){time+=dt;dirty=true;}if(animation&&renderer){const a=animation;a.elapsed+=dt;const u=clamp((a.elapsed-.18)/2.04);pose=mix(a.from,a.to,smooth(u));scene.dataset.phase=u<.1?'geometry':u<.48?'turn':u<.86?'gather':'settle';if(a.elapsed>=.98&&!a.contentChanged){updateContent(a.to);a.contentChanged=true;}dirty=true;if(a.elapsed>=2.4){current=a.to;pose=current;animation=null;busy=false;scene.dataset.phase='rest';updateContent(current);if(desired!==current)transition();}}if(dirty&&renderer){renderer(pose,time,isReduced()?0:3.2*Math.min(time/1.4,1));dirty=false;}}requestAnimationFrame(tick);}
