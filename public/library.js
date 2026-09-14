@@ -26,14 +26,19 @@ function bindViewer(id,token,signal){const dialog=document.querySelector('#exhib
 const tiltState=new Map();let tiltLoopRunning=false;
 function setTilt3D(el,nx,ny,px=16){let s=tiltState.get(el);if(!s){s={cx:0,cy:0};tiltState.set(el,s)}s.tx=nx*px;s.ty=ny*px;if(!tiltLoopRunning){tiltLoopRunning=true;requestAnimationFrame(tiltStep)}}
 function tiltStep(){let active=false;tiltState.forEach((s,el)=>{s.cx+=(s.tx-s.cx)*.24;s.cy+=(s.ty-s.cy)*.24;el.style.setProperty('--mx',s.cx.toFixed(2)+'px');el.style.setProperty('--my',s.cy.toFixed(2)+'px');if(Math.abs(s.tx-s.cx)>.05||Math.abs(s.ty-s.cy)>.05)active=true});if(active)requestAnimationFrame(tiltStep);else tiltLoopRunning=false}
-function setCardActive(art,on){art.classList.toggle('is-glow',on);art.closest('.collection,.work-card')?.classList.toggle('is-active',on)}
 function bindGlow(signal){
  const setPos=(art,x,y)=>{const r=art.getBoundingClientRect();art.style.setProperty('--gx',(x-r.left-r.width/2).toFixed(1)+'px');art.style.setProperty('--gy',(y-r.top-r.height/2).toFixed(1)+'px')};
- if(matchMedia('(hover:hover) and (pointer:fine)').matches){document.querySelectorAll('.cover-art,.work-art').forEach(art=>{art.addEventListener('pointerenter',e=>{setPos(art,e.clientX,e.clientY);setCardActive(art,true)},{signal});art.addEventListener('pointermove',e=>setPos(art,e.clientX,e.clientY),{signal});art.addEventListener('pointerleave',()=>setCardActive(art,false),{signal})})}
- let activeArt=null;
- const fromPoint=(x,y)=>{const el=document.elementFromPoint(x,y),art=el&&el.closest('.cover-art,.work-art');if(art!==activeArt){if(activeArt)setCardActive(activeArt,false);activeArt=art}if(art){setPos(art,x,y);setCardActive(art,true)}};
+ if(matchMedia('(hover:hover) and (pointer:fine)').matches){
+  document.querySelectorAll('.collection,.work-card').forEach(card=>{card.addEventListener('pointerenter',()=>card.classList.add('is-active'),{signal});card.addEventListener('pointerleave',()=>card.classList.remove('is-active'),{signal})});
+  document.querySelectorAll('.cover-art,.work-art').forEach(art=>{art.addEventListener('pointerenter',e=>{setPos(art,e.clientX,e.clientY);art.classList.add('is-glow')},{signal});art.addEventListener('pointermove',e=>setPos(art,e.clientX,e.clientY),{signal});art.addEventListener('pointerleave',()=>art.classList.remove('is-glow'),{signal})});
+ }
+ let activeCard=null,activeArt=null;
+ const fromPoint=(x,y)=>{const el=document.elementFromPoint(x,y),card=el&&el.closest('.collection,.work-card'),art=el&&el.closest('.cover-art,.work-art');
+  if(card!==activeCard){activeCard?.classList.remove('is-active');activeCard=card;activeCard?.classList.add('is-active')}
+  if(art!==activeArt){activeArt?.classList.remove('is-glow');activeArt=art}
+  if(art){setPos(art,x,y);art.classList.add('is-glow')}};
  const onTouch=e=>{const t=e.touches[0];if(t)fromPoint(t.clientX,t.clientY)};
- const onTouchEnd=()=>{if(activeArt)setCardActive(activeArt,false);activeArt=null};
+ const onTouchEnd=()=>{activeCard?.classList.remove('is-active');activeCard=null;activeArt?.classList.remove('is-glow');activeArt=null};
  document.addEventListener('touchstart',onTouch,{signal,passive:true});
  document.addEventListener('touchmove',onTouch,{signal,passive:true});
  document.addEventListener('touchend',onTouchEnd,{signal});
