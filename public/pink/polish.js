@@ -23,7 +23,7 @@ for(const [i,name]of ['sasaki-saku','makaino-ririmu','shiina-yuika'].entries()){
 }
 // One scheduled update touches only three portrait layers, never the whole page.
 let depthFrame=0,depthX=0,depthY=0,depthTX=0,depthTY=0;
-function applyDepth(active){characters.forEach(el=>{const p=el.querySelector('.portrait'),front=el.classList.contains('selected'),strength=front?18:8,rot=front?11:6;p.style.transition=active?'none':'';p.style.transform=`translate3d(${(depthX*strength).toFixed(2)}px,${(depthY*strength*.6).toFixed(2)}px,0) rotateX(${(-depthY*rot).toFixed(2)}deg) rotateY(${(depthX*rot).toFixed(2)}deg)`;});}
+function applyDepth(active){characters.forEach(el=>{const p=el.querySelector('.portrait'),front=el.classList.contains('selected'),strength=front?18:8;p.style.transition=active?'none':'';p.style.transform=`translate3d(${(depthX*strength).toFixed(2)}px,${(depthY*strength*.6).toFixed(2)}px,0)`;});}
 function paintDepth(){const settled=Math.abs(depthX-depthTX)<.002&&Math.abs(depthY-depthTY)<.002;if(settled){depthX=depthTX;depthY=depthTY}else{depthX+=(depthTX-depthX)*.16;depthY+=(depthTY-depthY)*.16}applyDepth(!settled);if(settled){depthFrame=0}else{depthFrame=requestAnimationFrame(paintDepth)}}
 poster.addEventListener('pointermove',e=>{if(e.pointerType!=='mouse'||paused||reduced.matches||e.buttons)return;depthTX=e.clientX/innerWidth*2-1;depthTY=e.clientY/innerHeight*2-1;if(!depthFrame)depthFrame=requestAnimationFrame(paintDepth);});
 function clearDepth(){depthX=depthY=depthTX=depthTY=0;cancelAnimationFrame(depthFrame);depthFrame=0;applyDepth(false);}

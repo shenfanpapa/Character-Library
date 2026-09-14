@@ -16,9 +16,9 @@
  toggle.addEventListener('click',()=>{if(!drag)setOpen(!open);drag=false});
  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&open)setOpen(false);if(e.key.toLowerCase()==='p'&&!e.repeat){userPaused=!userPaused;updatePause()}});
  document.addEventListener('visibilitychange',updatePause);
- let tx=0,ty=0,trx=0,try_=0,cx=0,cy=0,crx=0,cry=0,tiltLoopOn=false;
- function setStageTilt(nx,ny){tx=nx*16;ty=ny*13;trx=-ny*9;try_=nx*9;if(!tiltLoopOn){tiltLoopOn=true;requestAnimationFrame(stageTiltStep)}}
- function stageTiltStep(){cx+=(tx-cx)*.15;cy+=(ty-cy)*.15;crx+=(trx-crx)*.15;cry+=(try_-cry)*.15;stage.style.setProperty('--px',cx.toFixed(2)+'px');stage.style.setProperty('--py',cy.toFixed(2)+'px');stage.style.setProperty('--prx',crx.toFixed(2)+'deg');stage.style.setProperty('--pry',cry.toFixed(2)+'deg');if(Math.abs(tx-cx)>.03||Math.abs(ty-cy)>.03||Math.abs(trx-crx)>.02||Math.abs(try_-cry)>.02)requestAnimationFrame(stageTiltStep);else tiltLoopOn=false}
+ let tx=0,ty=0,cx=0,cy=0,tiltLoopOn=false;
+ function setStageTilt(nx,ny){tx=nx*16;ty=ny*13;if(!tiltLoopOn){tiltLoopOn=true;requestAnimationFrame(stageTiltStep)}}
+ function stageTiltStep(){cx+=(tx-cx)*.15;cy+=(ty-cy)*.15;stage.style.setProperty('--px',cx.toFixed(2)+'px');stage.style.setProperty('--py',cy.toFixed(2)+'px');if(Math.abs(tx-cx)>.03||Math.abs(ty-cy)>.03)requestAnimationFrame(stageTiltStep);else tiltLoopOn=false}
  stage.addEventListener('pointermove',e=>{if(e.pointerType==='touch'||reduced.matches||open)return;const r=stage.getBoundingClientRect();setStageTilt(((e.clientX-r.left)/r.width-.5)*2,((e.clientY-r.top)/r.height-.5)*2)});
  stage.addEventListener('pointerleave',()=>setStageTilt(0,0));
  let tiltBase=null,tiltRaf=0;
