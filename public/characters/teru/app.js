@@ -7,10 +7,10 @@
   const clamp=v=>Math.max(0,Math.min(1,v)), mix=(a,b,t)=>a+(b-a)*t;
   const smooth=v=>(v=clamp(v),v*v*(3-2*v));
   const segment=(p,a,b)=>smooth((p-a)/(b-a));
-  const state={p:0,from:0,target:0,start:0,duration:2100,moving:false,paused:false,time:0,last:0,x:0,y:0,px:0,py:0,vpx:0,vpy:0,ready:false,label:0};
+  const state={p:0,from:0,target:0,start:0,duration:2100,moving:false,paused:false,time:0,last:0,ready:false,label:0};
   const views=[{name:'Quiet Blessing',kicker:'THE QUIET BLESSING',title:'BLESSING / 01',line:'A little grace.<br>A world to explore.',description:'A rarely seen leader, with a heart that never stays indoors.'},{name:'A Little Secret',kicker:'JUST BETWEEN US',title:'SECRET / 02',line:'Keep it quiet.<br>Let curiosity lead.',description:'Even a leader deserves a little adventure beyond the ordinary.'},{name:'Festival Turn',kicker:'LET THE FESTIVAL BEGIN',title:'FESTIVAL / 03',line:'Bells in the air.<br>Not a care to spare.',description:'Duty can wait a moment. There is a whole city to discover.'}];
   const phase=(p,a,b,c,start=0,end=1)=>{const values=[a,b,c,a],i=Math.min(2,Math.floor(p));return mix(values[i],values[i+1],segment(p-i,start,end));};
-  let width=0,height=0,dpr=1,renderer=null,raf=0,lastDraw=-Infinity,lastLayout=NaN,lastGeoP=NaN,lastGeoX=NaN,lastGeoY=NaN;
+  let width=0,height=0,dpr=1,renderer=null,raf=0,lastDraw=-Infinity,lastLayout=NaN,lastGeoP=NaN;
   const stats={geometryFrames:0,layoutFrames:0,characterFrames:0};
   const g=geo.getContext('2d');
   const tile=document.createElement('canvas');tile.width=tile.height=17;const dots=tile.getContext('2d');dots.fillStyle='#302240';for(const y of[1,18]){dots.beginPath();dots.arc(8,y,2.8,0,Math.PI*2);dots.fill();}const dotPattern=g.createPattern(tile,'repeat');
@@ -58,10 +58,9 @@
   function beginTransition(){state.preparing=false;$('loadingNote').hidden=true;state.from=state.p;state.target=Math.floor(state.p)+1;state.start=performance.now();state.duration=reduced.matches?1:2200;state.moving=true;scene.setAttribute('aria-busy','true');scene.dataset.phase='transition';wake();}
   function switchView(){if(!state.ready)return;if(state.moving||state.preparing){state.pending=true;return;}if(renderer.prepare){state.preparing=true;scene.setAttribute('aria-busy','true');$('loadingNote').textContent='Preparing the next pose…';$('loadingNote').hidden=false;renderer.prepare(Math.floor(state.p)).then(beginTransition).catch(error=>{state.preparing=false;state.pending=false;scene.setAttribute('aria-busy','false');$('loadingNote').textContent='Could not load the next pose. Tap to retry.';console.error(error);});}else beginTransition();}
   function pause(){state.paused=!state.paused;scene.dataset.motion=state.paused?'paused':'playing';$('hint').textContent=state.paused?'MOTION PAUSED · PRESS P TO RESUME':'TAP ANYWHERE TO REFRAME';$('liveStatus').textContent=state.paused?'Ambient motion paused.':'Ambient motion resumed.';wake();}
-  function tick(now){raf=0;if(now-lastDraw<15.7){raf=requestAnimationFrame(tick);return;}lastDraw=now;const dt=Math.min(.05,(now-(state.last||now))/1000);state.last=now;if(!state.paused&&!reduced.matches)state.time+=dt;state.vpx=(state.vpx+(state.x-state.px)*.12)*.82;state.px+=state.vpx;state.vpy=(state.vpy+(state.y-state.py)*.12)*.82;state.py+=state.vpy;scene.style.setProperty('--hx',(state.px*26).toFixed(2)+'px');scene.style.setProperty('--hy',(state.py*20).toFixed(2)+'px');
-    if(state.moving){const f=clamp((now-state.start)/state.duration);state.p=mix(state.from,state.target,smooth(f));if(f===1){state.moving=false;state.p=state.target%3;scene.dataset.phase='idle';scene.setAttribute('aria-busy','false');scene.setAttribute('aria-label',`Teru in ${views[state.p].name}. Activate to change to ${views[(state.p+1)%3].name}. Press P to pause motion.`);$('liveStatus').textContent=views[state.p].name;if(state.pending){state.pending=false;switchView();}}}
-    if(state.p!==lastGeoP||state.px!==lastGeoX||state.py!==lastGeoY){geometry(state.p,state.time);lastGeoP=state.p;lastGeoX=state.px;lastGeoY=state.py;}layout(state.p);if(renderer){const edge=Math.min(2,Math.floor(state.p));renderer.draw(edge,segment(state.p-edge,.12,.9),state.time,reduced.matches?0:1);stats.characterFrames++;}
-    if(!raf&&!document.hidden&&(!state.paused&&!reduced.matches||state.moving||Math.abs(state.px-state.x)>.001||Math.abs(state.vpx)>.001||Math.abs(state.py-state.y)>.001||Math.abs(state.vpy)>.001))raf=requestAnimationFrame(tick);
+  function tick(now){raf=0;if(now-lastDraw<15.7){raf=requestAnimationFrame(tick);return;}lastDraw=now;const dt=Math.min(.05,(now-(state.last||now))/1000);state.last=now;if(!state.paused&&!reduced.matches)state.time+=dt;    if(state.moving){const f=clamp((now-state.start)/state.duration);state.p=mix(state.from,state.target,smooth(f));if(f===1){state.moving=false;state.p=state.target%3;scene.dataset.phase='idle';scene.setAttribute('aria-busy','false');scene.setAttribute('aria-label',`Teru in ${views[state.p].name}. Activate to change to ${views[(state.p+1)%3].name}. Press P to pause motion.`);$('liveStatus').textContent=views[state.p].name;if(state.pending){state.pending=false;switchView();}}}
+    if(state.p!==lastGeoP){geometry(state.p,state.time);lastGeoP=state.p;}layout(state.p);if(renderer){const edge=Math.min(2,Math.floor(state.p));renderer.draw(edge,segment(state.p-edge,.12,.9),state.time,reduced.matches?0:1);stats.characterFrames++;}
+    if(!raf&&!document.hidden&&(!state.paused&&!reduced.matches||state.moving))raf=requestAnimationFrame(tick);
   }
   function wake(){if(!raf){state.last=performance.now();raf=requestAnimationFrame(tick);}}
   let down=null,dragged=false;
@@ -69,15 +68,10 @@
   scene.addEventListener('pointerup',e=>{dragged=Boolean(down&&Math.hypot(e.clientX-down.x,e.clientY-down.y)>=12);down=null;});
   scene.addEventListener('click',()=>{if(!dragged)switchView();dragged=false;});
   scene.addEventListener('pointercancel',()=>{down=null;dragged=true;});
-  scene.addEventListener('pointermove',e=>{if(e.pointerType==='touch'||reduced.matches)return;const r=scene.getBoundingClientRect();state.x=(e.clientX-r.left)/r.width*2-1;state.y=(e.clientY-r.top)/r.height*2-1;wake();});
-  scene.addEventListener('pointerleave',()=>{state.x=state.y=0;wake();});
-  let tiltBase=null,tiltRaf=0;
-  function applyTilt(beta,gamma){if(reduced.matches)return;if(tiltBase===null)tiltBase=beta||0;const gx=Math.max(-24,Math.min(24,gamma||0))/24,by=Math.max(-24,Math.min(24,(beta||0)-tiltBase))/24;state.x=gx;state.y=by;wake();}
-  if('DeviceOrientationEvent' in window)document.addEventListener('touchstart',function start(){document.removeEventListener('touchstart',start);const attach=()=>window.addEventListener('deviceorientation',e=>{if(tiltRaf)return;tiltRaf=requestAnimationFrame(()=>{applyTilt(e.beta,e.gamma);tiltRaf=0})});if(typeof DeviceOrientationEvent.requestPermission==='function'){DeviceOrientationEvent.requestPermission().then(perm=>{if(perm==='granted')attach()}).catch(()=>{})}else attach()},{passive:true});
   scene.addEventListener('keydown',e=>{if(e.repeat)return;if(e.key===' '||e.key==='Enter'){e.preventDefault();switchView();}if(e.key.toLowerCase()==='p'){e.preventDefault();pause();}});
   window.addEventListener('resize',()=>{resize();wake();});
   document.addEventListener('visibilitychange',()=>{if(document.hidden){cancelAnimationFrame(raf);raf=0;}else wake();});
-  reduced.addEventListener('change',()=>{state.x=state.y=0;wake();});
+  reduced.addEventListener('change',()=>wake());
   window.TeruUI={state,stats,switchView,pause,drawAt(p,t=0){p=Math.max(0,Math.min(2.999999,p));geometry(p,t);layout(p);const edge=Math.floor(p);renderer?.draw(edge,segment(p-edge,.12,.9),t,1);},get renderer(){return renderer;}};
   resize();wake();
   async function initialize(){
