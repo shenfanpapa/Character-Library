@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#ffde35">
+  <meta name="description" content="Teru — a quiet blessing, a little secret, a festival turn. An interactive character study inspired by Star Engine Party.">
+  <title>TERU — Blessing / Secret / Festival</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='5' fill='%23ffde35'/%3E%3Cpath d='M4 5 14 12 16 27 2 16ZM28 5 18 12 16 27 30 16Z' fill='%23e73745'/%3E%3Cpath d='m12 18 4-5 4 5-4 5Z' fill='%23302240'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="../../embedded.css">
+</head>
+<body>
+  <main id="scene" class="scene" data-view="blessing" tabindex="0" role="button" aria-label="Teru in Quiet Blessing. Activate to change to A Little Secret. Press P to pause motion." aria-busy="true">
+    <canvas id="geometry" class="geometry" aria-hidden="true"></canvas>
+    <div class="paper-grain" aria-hidden="true"></div>
+    <header class="masthead">
+      <div class="brand"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M6 5 22 16 24 43 2 23ZM42 5 26 16 24 43 46 23Z"/><path class="mark-center" d="m17 25 7-9 7 9-7 8Z"/></svg><span>TERU<span class="brand-caption">A SPIRIT IN MOTION</span></span></div>
+      <span class="edition">STAR ENGINE PARTY<br>CHARACTER STUDY · 01</span>
+    </header>
+    <div class="hero-title" id="titleGroup">
+      <p class="eyebrow"><span class="dash"></span><span id="kicker">THE QUIET BLESSING</span></p>
+      <h1>TERU<span class="title-dot" aria-hidden="true">✦</span></h1>
+    </div>
+    <div class="rule-group" id="ruleGroup" aria-hidden="true"><span></span><b id="viewNumber">01</b><i></i></div>
+    <section class="copy-group" id="copyGroup" aria-label="Character introduction">
+      <h2 id="chapterTitle">BLESSING / 01</h2>
+      <p class="statement" id="statement">A little grace.<br>A world to explore.</p>
+      <p class="description" id="description">A rarely seen leader, with a heart that never stays indoors.</p>
+      <p class="interaction-hint"><span class="hint-symbol" aria-hidden="true">↗</span><span id="hint">TAP ANYWHERE TO REFRAME</span></p>
+    </section>
+    <div id="characterWrap" class="character-wrap"><canvas id="character" role="img" aria-label="Geometric Teru with coral braids, fox ears, white ceremonial sleeves, a vermilion skirt and a leafy ritual wand."></canvas></div>
+    <div class="side-label" aria-hidden="true">GOOD FORTUNE FAVORS THE CURIOUS</div>
+    <footer class="folio"><span>02.19 <i> / </i> TERU</span><span class="folio-center">BLESSING <i> / </i> SECRET <i> / </i> FESTIVAL</span><span>UNOFFICIAL FAN STUDY</span></footer>
+    <span class="loading-note" id="loadingNote" role="status">Preparing Teru…</span>
+    <span id="liveStatus" class="sr-only" aria-live="polite"></span>
+  </main>
+  <script src="assets.js"></script>
+  <script src="character.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="zh-CN">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><meta name="theme-color" content="#f02c79"><title>PINK! — play the poster</title><link rel="stylesheet" href="style.css"><link rel="stylesheet" href="fullbody.css"><link rel="stylesheet" href="polish.css"><link rel="stylesheet" href="refine.css"></head>
+<body>
+<main id="poster" data-theme="pink">
+  <div class="paper" aria-hidden="true"></div><div class="orbit" aria-hidden="true"></div><div class="giant" aria-hidden="true">PINK!</div>
+  <header class="chrome"><a class="brand" href="#" aria-label="恢复初始画面">PINK<span>!</span><small>PLAY THE POSTER</small></a><div class="edition">INTERACTIVE EDITION <span>✦</span> VOL. 01 / 03</div><button id="motion" class="icon" aria-label="暂停动态" aria-pressed="false" title="暂停动态">Ⅱ</button></header>
+  <div class="margin-label chrome">SWEET CHAOS / THREE OF A KIND</div>
+  <section id="cast" aria-label="选择角色，左右滑动切换">
+    <button class="character" data-id="0" style="--slice:0%;--slot:0;--tilt:-7deg" aria-label="选择笹木咲" aria-pressed="false"><span class="portrait"><span class="art"></span></span><span class="character-label">01 <b>♡</b></span></button>
+    <button class="character selected" data-id="1" style="--slice:50%;--slot:1;--tilt:2deg" aria-label="选择魔界ノりりむ" aria-pressed="true"><span class="portrait"><span class="art"></span></span><span class="character-label">02 <b>✧</b></span></button>
+    <button class="character" data-id="2" style="--slice:100%;--slot:2;--tilt:8deg" aria-label="选择椎名唯華" aria-pressed="false"><span class="portrait"><span class="art"></span></span><span class="character-label">03 <b>✚</b></span></button>
+  </section>
+  <div class="tape tape-one" aria-hidden="true">TOO CUTE TO BE QUIET ✦ TOO CUTE TO BE QUIET ✦</div>
+  <div class="tape tape-two" aria-hidden="true">HANDLE WITH ♡</div>
+  <button class="sticker heart" style="left:9%;top:29%" aria-label="爱心贴纸，可拖动或用方向键移动" title="拖动贴纸 · 方向键移动">♡</button>
+  <button class="sticker star" style="left:79%;top:17%" aria-label="星星贴纸，可拖动或用方向键移动" title="拖动贴纸 · 方向键移动">✦</button>
+  <button class="sticker patch" style="left:83%;top:61%" aria-label="创可贴贴纸，可拖动或用方向键移动" title="拖动贴纸 · 方向键移动">✚ × ×</button>
+  <aside class="tools chrome" aria-label="画面工具"><button id="toy-toggle" class="icon" aria-label="打开物品盒" aria-expanded="false" aria-controls="toy-tray" title="物品盒">✧</button><button id="palette" class="icon magnetic" aria-label="切换背景配色" title="切换配色">◐</button><button id="shuffle" class="icon magnetic" aria-label="切换到下一位角色" title="下一位角色">⇄</button><button id="view" class="icon magnetic" aria-label="纯海报模式" title="纯海报模式">⛶</button></aside>
+  <section id="toy-tray" class="chrome" aria-label="物品盒" inert>
+    <div class="tray-heading"><span>CHARM BOX <small id="toy-count">03 / 08</small></span><button id="tray-close" aria-label="关闭物品盒">×</button></div>
+    <div class="toy-menu"><button data-toy="heart" aria-label="添加爱心" title="爱心">♡</button><button data-toy="star" aria-label="添加星星" title="星星">✦</button><button data-toy="patch" aria-label="添加创可贴" title="创可贴">✚</button><button data-toy="bow" aria-label="添加蝴蝶结" title="蝴蝶结">⋈</button><button data-toy="ring" aria-label="添加圆环" title="圆环">◎</button><button data-toy="spark" aria-label="添加闪光" title="闪光">✳</button></div>
+    <div class="toy-actions"><button id="gravity" aria-pressed="false">↓ 重力</button><button id="scatter">↗ 弹开</button><button id="reset-toys">↺ 复位</button></div>
+    <label class="elastic-control" for="elasticity">弹性 <input id="elasticity" type="range" min="35" max="95" value="78"><output id="elasticity-value">78%</output></label>
+  </section>
+  <div class="nameplate chrome"><span id="character-name">魔界ノりりむ</span><span class="name-line"></span><small id="character-mark">MAKAINO RIRIMU</small></div>
+  <button id="gallery" class="gallery chrome" aria-label="展开参考原画" title="展开原画"><img src="assets/reference.png" alt="三位角色的原画"><span>ORIGINAL ↗</span></button>
+  <footer class="chrome"><span class="issue">✳ <span>MAKE A LITTLE<br> PINK NOISE.</span></span><nav aria-label="角色切换"><button id="prev" aria-label="上一位角色">←</button><button class="avatar" data-select="0" aria-label="笹木咲" aria-pressed="false" style="--slice:0%"></button><button class="avatar active" data-select="1" aria-label="魔界ノりりむ" aria-pressed="true" style="--slice:50%"></button><button class="avatar" data-select="2" aria-label="椎名唯華" aria-pressed="false" style="--slice:100%"></button><button id="next" aria-label="下一位角色">→</button></nav><span id="count">02 <i>/</i> 03</span></footer>
+  <button id="restore" aria-label="退出纯海报模式" title="退出纯海报模式">↙</button><div id="particles" aria-hidden="true"></div><span id="status" role="status" class="sr-only"></span>
+</main>
+<dialog id="lightbox" aria-label="参考原画"><button id="close" class="icon" aria-label="关闭原画">×</button><img src="assets/reference.png" alt="粉色哥特风格三人原画"></dialog>
+<script src="state.js"></script><script src="app.js"></script><script src="toy-art.js"></script><script src="elastic.js"></script><script src="polish.js"></script>
+</body></html>
+
+
+
+
+

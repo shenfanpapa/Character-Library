@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#edece6">
+  <meta name="description" content="Testament — an unofficial Guilty Gear Strive character portrait. Beyond the crimson blade, a gentler soul.">
+  <title>TESTAMENT — Beyond the Crimson</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23edece6'/%3E%3Cpath d='M26 3A14 14 0 1 0 28 26 12 12 0 0 1 26 3Z' fill='%23a92535'/%3E%3Cpath d='m18 7 3 14-8-6Z' fill='%231e292d'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="../../embedded.css">
+</head>
+<body>
+  <main id="stage" class="stage" data-state="portrait" aria-label="Testament character portrait">
+    <div class="paper-grid" aria-hidden="true"></div>
+    <div class="geometry" aria-hidden="true">
+      <div class="red-disc"></div><div class="disc-cut"></div>
+      <div class="orbit orbit-one"></div><div class="orbit orbit-two"></div>
+      <div class="rule-plane"></div><div class="black-plane"></div>
+      <div class="slat slat-a"></div><div class="slat slat-b"></div><div class="slat slat-c"></div>
+      <div class="fan"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+      <div class="diamond d1"></div><div class="diamond d2"></div><div class="diamond d3"></div>
+      <div class="registration reg-a"><i></i><b></b></div><div class="registration reg-b"><i></i><b></b></div>
+      <div class="hatched-field"></div><div class="small-ring"></div>
+    </div>
+    <header class="masthead">
+      <img class="game-logo" src="assets/guilty-gear.png" alt="Guilty Gear Strive" width="230" height="83">
+      <div class="edition"><span>CHARACTER ARCHIVE</span><span>GG / T—01</span></div>
+    </header>
+    <div class="title-group" id="titleGroup">
+      <p class="eyebrow"><span></span> BEYOND THE CRIMSON</p>
+      <h1>TESTAMENT</h1>
+      <div class="title-rule"><span></span><b>01</b></div>
+    </div>
+    <div class="portrait-note"><span class="note-index">I.</span><p>A crimson blade.<br><em>A gentler soul.</em></p><span class="small-label">GEAR / GUARDIAN</span></div>
+    <div class="character-position" id="characterPosition"><div class="character-art" id="characterArt" role="img" aria-label="Faceted Testament in a black top hat and flowing black clothing, holding a huge crimson scythe, one hand raised above their hat."></div></div>
+    <div class="arc-caption" aria-hidden="true">BLOOD MAGIC — A WILL OF THEIR OWN</div>
+    <button id="sceneToggle" class="scene-toggle" type="button" aria-controls="dossier" aria-expanded="false" aria-label="Reveal Testament's story"></button>
+    <section class="dossier" id="dossier" aria-labelledby="dossierTitle" inert aria-hidden="true">
+      <div class="dossier-frame" aria-hidden="true"><span></span><span></span><span></span></div>
+      <div class="dossier-content">
+        <p class="section-label">THE PERSON BEHIND THE BLADE</p>
+        <h2 id="dossierTitle">A will of<br><em>their own.</em></h2>
+        <p class="lead">Once bound to another's command.<br>Now free to choose kindness.</p>
+        <div class="bio-divider"><i></i><span>TESTAMENT / PROFILE</span></div>
+        <p class="bio">Kliff Undersn's adopted child, Testament was transformed into a Gear and forced to fight under Justice's control. Freedom brought a long reckoning with the past.</p>
+        <p class="bio">In protecting Dizzy and watching over the Forest of Demons, they found a new purpose. Behind the crimson scythe is a gentle, curious spirit, learning to welcome the world again.</p>
+        <dl class="facts"><div><dt>NATURE</dt><dd>Humanoid Gear</dd></div><div><dt>ART</dt><dd>Blood magic</dd></div><div><dt>WEAPON</dt><dd>Crimson scythe</dd></div></dl>
+      </div>
+    </section>
+    <footer class="footer"><span>TESTAMENT <i> / </i> GUILTY GEAR —STRIVE—</span><span class="fan-credit">UNOFFICIAL FAN STUDY</span></footer>
+    <span id="assetStatus" class="asset-status" role="status">Preparing the portrait…</span>
+    <span class="sr-only" id="liveStatus" aria-live="polite"></span>
+  </main>
+  <script src="assets/character-manifest.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
