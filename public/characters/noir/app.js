@@ -21,9 +21,9 @@ scene.addEventListener('click',event=>{if(scrollGesture){scrollGesture=false;ret
 scene.addEventListener('keydown',event=>{if(event.target!==scene||event.repeat)return;if(event.key==='Enter'||event.key===' '){event.preventDefault();switchLayout();}else if(event.key.toLowerCase()==='p'){setPause(!paused);document.getElementById('announcement').textContent=paused?'Clothing motion paused':'Clothing motion resumed';}});
 reduced.addEventListener('change',event=>setPause(event.matches));setPause(paused);
 const characterEl=document.querySelector('.character');
-let htx=0,hty=0,hcx=0,hcy=0,hoverLoopOn=false;
+let htx=0,hty=0,hcx=0,hcy=0,hvx=0,hvy=0,hoverLoopOn=false;
 function setHoverTilt(nx,ny){htx=nx*26;hty=ny*20;if(!hoverLoopOn){hoverLoopOn=true;requestAnimationFrame(hoverTiltStep)}}
-function hoverTiltStep(){hcx+=(htx-hcx)*.15;hcy+=(hty-hcy)*.15;characterEl.style.setProperty('--hx',hcx.toFixed(2)+'px');characterEl.style.setProperty('--hy',hcy.toFixed(2)+'px');if(Math.abs(htx-hcx)>.03||Math.abs(hty-hcy)>.03)requestAnimationFrame(hoverTiltStep);else hoverLoopOn=false}
+function hoverTiltStep(){hvx=(hvx+(htx-hcx)*.12)*.82;hcx+=hvx;hvy=(hvy+(hty-hcy)*.12)*.82;hcy+=hvy;characterEl.style.setProperty('--hx',hcx.toFixed(2)+'px');characterEl.style.setProperty('--hy',hcy.toFixed(2)+'px');if(Math.abs(htx-hcx)>.03||Math.abs(hvx)>.03||Math.abs(hty-hcy)>.03||Math.abs(hvy)>.03)requestAnimationFrame(hoverTiltStep);else hoverLoopOn=false}
 scene.addEventListener('pointermove',e=>{if(e.pointerType==='touch'||reduced.matches)return;const r=scene.getBoundingClientRect();setHoverTilt(((e.clientX-r.left)/r.width-.5)*2,((e.clientY-r.top)/r.height-.5)*2);});
 scene.addEventListener('pointerleave',()=>setHoverTilt(0,0));
 let tiltBase=null,tiltRaf=0;

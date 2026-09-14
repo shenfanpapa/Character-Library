@@ -23,9 +23,9 @@ scene.addEventListener('pointercancel',()=>press=null);
 scene.addEventListener('pointerup',e=>{if(press&&performance.now()-press.at>=650&&Math.hypot(e.clientX-press.x,e.clientY-press.y)<12){suppressClickUntil=performance.now()+400;toggleMotion();}press=null;});
 scene.addEventListener('keydown',e=>{if(e.target!==scene||e.repeat)return;if(e.key==='Enter'||e.key===' '){e.preventDefault();toggle();}else if(e.key.toLowerCase()==='p'){toggleMotion();}});
 const poseWindow=document.getElementById('poseWindow');
-let htx=0,hty=0,hcx=0,hcy=0,hoverLoopOn=false;
+let htx=0,hty=0,hcx=0,hcy=0,hvx=0,hvy=0,hoverLoopOn=false;
 function setHoverTilt(nx,ny){htx=nx*26;hty=ny*20;if(!hoverLoopOn){hoverLoopOn=true;requestAnimationFrame(hoverTiltStep)}}
-function hoverTiltStep(){hcx+=(htx-hcx)*.15;hcy+=(hty-hcy)*.15;poseWindow.style.setProperty('--hx',hcx.toFixed(2)+'px');poseWindow.style.setProperty('--hy',hcy.toFixed(2)+'px');if(Math.abs(htx-hcx)>.03||Math.abs(hty-hcy)>.03)requestAnimationFrame(hoverTiltStep);else hoverLoopOn=false}
+function hoverTiltStep(){hvx=(hvx+(htx-hcx)*.12)*.82;hcx+=hvx;hvy=(hvy+(hty-hcy)*.12)*.82;hcy+=hvy;poseWindow.style.setProperty('--hx',hcx.toFixed(2)+'px');poseWindow.style.setProperty('--hy',hcy.toFixed(2)+'px');if(Math.abs(htx-hcx)>.03||Math.abs(hvx)>.03||Math.abs(hty-hcy)>.03||Math.abs(hvy)>.03)requestAnimationFrame(hoverTiltStep);else hoverLoopOn=false}
 scene.addEventListener('pointermove',e=>{if(e.pointerType==='touch'||isReduced())return;const r=scene.getBoundingClientRect();setHoverTilt(((e.clientX-r.left)/r.width-.5)*2,((e.clientY-r.top)/r.height-.5)*2);});
 scene.addEventListener('pointerleave',()=>setHoverTilt(0,0));
 let tiltBase=null,tiltRaf=0;
