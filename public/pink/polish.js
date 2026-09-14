@@ -22,11 +22,11 @@ for(const [i,name]of ['sasaki-saku','makaino-ririmu','shiina-yuika'].entries()){
   const img=new Image();img.src=`assets/${name}-original.png`;img.onerror=()=>{$('#status').textContent=`${characters[i].getAttribute('aria-label')}素材加载失败，请刷新页面。`;};
 }
 // One scheduled update touches only three portrait layers, never the whole page.
-let depthFrame=0,depthX=0,depthY=0,depthTX=0,depthTY=0;
+let depthFrame=0,depthX=0,depthY=0,depthVX=0,depthVY=0,depthTX=0,depthTY=0;
 function applyDepth(active){characters.forEach(el=>{const p=el.querySelector('.portrait'),front=el.classList.contains('selected'),strength=front?18:8;p.style.transition=active?'none':'';p.style.transform=`translate3d(${(depthX*strength).toFixed(2)}px,${(depthY*strength*.6).toFixed(2)}px,0)`;});}
-function paintDepth(){const settled=Math.abs(depthX-depthTX)<.002&&Math.abs(depthY-depthTY)<.002;if(settled){depthX=depthTX;depthY=depthTY}else{depthX+=(depthTX-depthX)*.16;depthY+=(depthTY-depthY)*.16}applyDepth(!settled);if(settled){depthFrame=0}else{depthFrame=requestAnimationFrame(paintDepth)}}
+function paintDepth(){depthVX=(depthVX+(depthTX-depthX)*.12)*.82;depthX+=depthVX;depthVY=(depthVY+(depthTY-depthY)*.12)*.82;depthY+=depthVY;const settled=Math.abs(depthX-depthTX)<.002&&Math.abs(depthVX)<.002&&Math.abs(depthY-depthTY)<.002&&Math.abs(depthVY)<.002;applyDepth(!settled);if(settled){depthFrame=0}else{depthFrame=requestAnimationFrame(paintDepth)}}
 poster.addEventListener('pointermove',e=>{if(e.pointerType!=='mouse'||paused||reduced.matches||e.buttons)return;depthTX=e.clientX/innerWidth*2-1;depthTY=e.clientY/innerHeight*2-1;if(!depthFrame)depthFrame=requestAnimationFrame(paintDepth);});
-function clearDepth(){depthX=depthY=depthTX=depthTY=0;cancelAnimationFrame(depthFrame);depthFrame=0;applyDepth(false);}
+function clearDepth(){depthX=depthY=depthTX=depthTY=depthVX=depthVY=0;cancelAnimationFrame(depthFrame);depthFrame=0;applyDepth(false);}
 function releaseDepth(){depthTX=depthTY=0;if(!depthFrame)depthFrame=requestAnimationFrame(paintDepth);}
 poster.addEventListener('pointerleave',releaseDepth);$('#motion').addEventListener('click',clearDepth);reduced.addEventListener('change',clearDepth);document.addEventListener('visibilitychange',clearDepth);
 let tiltBase=null,tiltFrame=0;
