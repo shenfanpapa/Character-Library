@@ -20,6 +20,12 @@ let touchStart=null,scrollGesture=false;scene.addEventListener('pointerdown',e=>
 scene.addEventListener('click',event=>{if(scrollGesture){scrollGesture=false;return;}if(!event.target.closest('a')&&!window.getSelection()?.toString())switchLayout();});
 scene.addEventListener('keydown',event=>{if(event.target!==scene||event.repeat)return;if(event.key==='Enter'||event.key===' '){event.preventDefault();switchLayout();}else if(event.key.toLowerCase()==='p'){setPause(!paused);document.getElementById('announcement').textContent=paused?'Clothing motion paused':'Clothing motion resumed';}});
 reduced.addEventListener('change',event=>setPause(event.matches));setPause(paused);
+const characterEl=document.querySelector('.character');let hoverRaf=0;
+scene.addEventListener('pointermove',e=>{if(e.pointerType==='touch'||reduced.matches||hoverRaf)return;const x=e.clientX,y=e.clientY;hoverRaf=requestAnimationFrame(()=>{const r=scene.getBoundingClientRect();characterEl.style.setProperty('--hx',((x-r.left)/r.width-.5)*30+'px');characterEl.style.setProperty('--hy',((y-r.top)/r.height-.5)*22+'px');hoverRaf=0;});});
+scene.addEventListener('pointerleave',()=>{characterEl.style.setProperty('--hx','0px');characterEl.style.setProperty('--hy','0px');});
+let tiltBase=null,tiltRaf=0;
+function applyTilt(beta,gamma){if(reduced.matches)return;if(tiltBase===null)tiltBase=beta||0;const gx=Math.max(-24,Math.min(24,gamma||0)),by=Math.max(-24,Math.min(24,(beta||0)-tiltBase));characterEl.style.setProperty('--hx',(gx*1.15).toFixed(1)+'px');characterEl.style.setProperty('--hy',(by*.95).toFixed(1)+'px');}
+if('DeviceOrientationEvent' in window)document.addEventListener('touchstart',function start(){document.removeEventListener('touchstart',start);const attach=()=>window.addEventListener('deviceorientation',e=>{if(tiltRaf)return;tiltRaf=requestAnimationFrame(()=>{applyTilt(e.beta,e.gamma);tiltRaf=0;});});if(typeof DeviceOrientationEvent.requestPermission==='function'){DeviceOrientationEvent.requestPermission().then(perm=>{if(perm==='granted')attach();}).catch(()=>{});}else attach();},{passive:true});
 // Shared continuous mesh pins the seams of separately extracted RGBA parts.
 // Local displacement fields give hair locks, sleeves, skirt and bow different phases.
 async function startCharacter(){
