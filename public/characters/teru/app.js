@@ -21,7 +21,7 @@
     stats.geometryFrames++;
     g.clearRect(0,0,width,height);const w=width,h=height,mobile=w<=700;
     g.fillStyle='#ffde35';g.fillRect(0,0,w,h);
-    const edge=Math.min(2,Math.floor(p)),local=p-edge,hoverX=state.px*8,hoverY=state.py*6;
+    const edge=Math.min(2,Math.floor(p)),local=p-edge,hoverX=state.px*12,hoverY=state.py*9;
     // Main color field opens as a circle and folds into a clean octagonal frame.
     const cx=phase(p,mobile?.72:.79,mobile?.22:.24,.75,0,.65)*w+hoverX,cy=phase(p,.46,.53,.56,0,.65)*h+hoverY;
     const radius=(mobile?.68:.43)*Math.max(w,mobile?w:h);
@@ -58,7 +58,7 @@
   function beginTransition(){state.preparing=false;$('loadingNote').hidden=true;state.from=state.p;state.target=Math.floor(state.p)+1;state.start=performance.now();state.duration=reduced.matches?1:2200;state.moving=true;scene.setAttribute('aria-busy','true');scene.dataset.phase='transition';wake();}
   function switchView(){if(!state.ready)return;if(state.moving||state.preparing){state.pending=true;return;}if(renderer.prepare){state.preparing=true;scene.setAttribute('aria-busy','true');$('loadingNote').textContent='Preparing the next pose…';$('loadingNote').hidden=false;renderer.prepare(Math.floor(state.p)).then(beginTransition).catch(error=>{state.preparing=false;state.pending=false;scene.setAttribute('aria-busy','false');$('loadingNote').textContent='Could not load the next pose. Tap to retry.';console.error(error);});}else beginTransition();}
   function pause(){state.paused=!state.paused;scene.dataset.motion=state.paused?'paused':'playing';$('hint').textContent=state.paused?'MOTION PAUSED · PRESS P TO RESUME':'TAP ANYWHERE TO REFRAME';$('liveStatus').textContent=state.paused?'Ambient motion paused.':'Ambient motion resumed.';wake();}
-  function tick(now){raf=0;if(now-lastDraw<15.7){raf=requestAnimationFrame(tick);return;}lastDraw=now;const dt=Math.min(.05,(now-(state.last||now))/1000);state.last=now;if(!state.paused&&!reduced.matches)state.time+=dt;state.px=Math.abs(state.px-state.x)<.001?state.x:mix(state.px,state.x,.16);state.py=Math.abs(state.py-state.y)<.001?state.y:mix(state.py,state.y,.16);
+  function tick(now){raf=0;if(now-lastDraw<15.7){raf=requestAnimationFrame(tick);return;}lastDraw=now;const dt=Math.min(.05,(now-(state.last||now))/1000);state.last=now;if(!state.paused&&!reduced.matches)state.time+=dt;state.px=Math.abs(state.px-state.x)<.001?state.x:mix(state.px,state.x,.22);state.py=Math.abs(state.py-state.y)<.001?state.y:mix(state.py,state.y,.22);
     if(state.moving){const f=clamp((now-state.start)/state.duration);state.p=mix(state.from,state.target,smooth(f));if(f===1){state.moving=false;state.p=state.target%3;scene.dataset.phase='idle';scene.setAttribute('aria-busy','false');scene.setAttribute('aria-label',`Teru in ${views[state.p].name}. Activate to change to ${views[(state.p+1)%3].name}. Press P to pause motion.`);$('liveStatus').textContent=views[state.p].name;if(state.pending){state.pending=false;switchView();}}}
     if(state.p!==lastGeoP||state.px!==lastGeoX||state.py!==lastGeoY){geometry(state.p,state.time);lastGeoP=state.p;lastGeoX=state.px;lastGeoY=state.py;}layout(state.p);if(renderer){const edge=Math.min(2,Math.floor(state.p));renderer.draw(edge,segment(state.p-edge,.12,.9),state.time,reduced.matches?0:1);stats.characterFrames++;}
     if(!raf&&!document.hidden&&(!state.paused&&!reduced.matches||state.moving||Math.abs(state.px-state.x)>.001||Math.abs(state.py-state.y)>.001))raf=requestAnimationFrame(tick);
@@ -71,6 +71,9 @@
   scene.addEventListener('pointercancel',()=>{down=null;dragged=true;});
   scene.addEventListener('pointermove',e=>{if(e.pointerType==='touch'||reduced.matches)return;const r=scene.getBoundingClientRect();state.x=(e.clientX-r.left)/r.width*2-1;state.y=(e.clientY-r.top)/r.height*2-1;wake();});
   scene.addEventListener('pointerleave',()=>{state.x=state.y=0;wake();});
+  let tiltBase=null,tiltRaf=0;
+  function applyTilt(beta,gamma){if(reduced.matches)return;if(tiltBase===null)tiltBase=beta||0;const gx=Math.max(-24,Math.min(24,gamma||0))/24,by=Math.max(-24,Math.min(24,(beta||0)-tiltBase))/24;state.x=gx;state.y=by;wake();}
+  if('DeviceOrientationEvent' in window)document.addEventListener('touchstart',function start(){document.removeEventListener('touchstart',start);const attach=()=>window.addEventListener('deviceorientation',e=>{if(tiltRaf)return;tiltRaf=requestAnimationFrame(()=>{applyTilt(e.beta,e.gamma);tiltRaf=0})});if(typeof DeviceOrientationEvent.requestPermission==='function'){DeviceOrientationEvent.requestPermission().then(perm=>{if(perm==='granted')attach()}).catch(()=>{})}else attach()},{passive:true});
   scene.addEventListener('keydown',e=>{if(e.repeat)return;if(e.key===' '||e.key==='Enter'){e.preventDefault();switchView();}if(e.key.toLowerCase()==='p'){e.preventDefault();pause();}});
   window.addEventListener('resize',()=>{resize();wake();});
   document.addEventListener('visibilitychange',()=>{if(document.hidden){cancelAnimationFrame(raf);raf=0;}else wake();});
