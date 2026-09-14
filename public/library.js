@@ -26,7 +26,19 @@ function bindViewer(id,token,signal){const dialog=document.querySelector('#exhib
 const tiltState=new Map();let tiltLoopRunning=false;
 function setTilt3D(el,nx,ny,px=16){let s=tiltState.get(el);if(!s){s={cx:0,cy:0};tiltState.set(el,s)}s.tx=nx*px;s.ty=ny*px;if(!tiltLoopRunning){tiltLoopRunning=true;requestAnimationFrame(tiltStep)}}
 function tiltStep(){let active=false;tiltState.forEach((s,el)=>{s.cx+=(s.tx-s.cx)*.24;s.cy+=(s.ty-s.cy)*.24;el.style.setProperty('--mx',s.cx.toFixed(2)+'px');el.style.setProperty('--my',s.cy.toFixed(2)+'px');if(Math.abs(s.tx-s.cx)>.05||Math.abs(s.ty-s.cy)>.05)active=true});if(active)requestAnimationFrame(tiltStep);else tiltLoopRunning=false}
-function bindGlow(signal){if(!matchMedia('(hover:hover) and (pointer:fine)').matches)return;document.querySelectorAll('.cover-art,.work-art').forEach(art=>{art.addEventListener('pointermove',e=>{const r=art.getBoundingClientRect();art.style.setProperty('--gx',((e.clientX-r.left)/r.width*100).toFixed(1)+'%');art.style.setProperty('--gy',((e.clientY-r.top)/r.height*100).toFixed(1)+'%')},{signal})})}
+function bindGlow(signal){
+ const setPos=(art,x,y)=>{const r=art.getBoundingClientRect();art.style.setProperty('--gx',((x-r.left)/r.width*100).toFixed(1)+'%');art.style.setProperty('--gy',((y-r.top)/r.height*100).toFixed(1)+'%')};
+ if(matchMedia('(hover:hover) and (pointer:fine)').matches){document.querySelectorAll('.cover-art,.work-art').forEach(art=>{art.addEventListener('pointermove',e=>{setPos(art,e.clientX,e.clientY);art.classList.add('is-glow')},{signal});art.addEventListener('pointerleave',()=>art.classList.remove('is-glow'),{signal})})}
+ let activeArt=null;
+ const fromPoint=(x,y)=>{const el=document.elementFromPoint(x,y),art=el&&el.closest('.cover-art,.work-art');if(art!==activeArt){activeArt?.classList.remove('is-glow');activeArt=art}if(art){setPos(art,x,y);art.classList.add('is-glow')}};
+ const onTouch=e=>{const t=e.touches[0];if(t)fromPoint(t.clientX,t.clientY)};
+ const onTouchEnd=()=>{activeArt?.classList.remove('is-glow');activeArt=null};
+ document.addEventListener('touchstart',onTouch,{signal,passive:true});
+ document.addEventListener('touchmove',onTouch,{signal,passive:true});
+ document.addEventListener('touchend',onTouchEnd,{signal});
+ document.addEventListener('touchcancel',onTouchEnd,{signal});
+ signal.addEventListener('abort',onTouchEnd,{once:true});
+}
 function bindCovers(signal){const hoverCapable=matchMedia('(hover:hover) and (pointer:fine)').matches&&!reduced.matches;document.querySelectorAll('.collection').forEach(card=>{const wrap=card.querySelector('.enter-wrap'),drip=card.querySelector('.enter-drip');const release=()=>{card.classList.remove('is-pressed');if(wrap){wrap.style.setProperty('--mgx','0px');wrap.style.setProperty('--mgy','0px')}drip?.style.setProperty('--ds','0')};const pullWithin=(cx,cy,radius,floor)=>{if(!wrap)return;const wr=wrap.getBoundingClientRect(),wx=wr.left+wr.width/2,wy=wr.top+wr.height/2,dx=cx-wx,dy=cy-wy,dist=Math.hypot(dx,dy);if(dist>=radius){release();return}const amount=1-dist/radius;wrap.style.setProperty('--mgx',`${(dx*.34).toFixed(1)}px`);wrap.style.setProperty('--mgy',`${(dy*.34).toFixed(1)}px`);if(drip){const clamped=Math.min(dist,46),ang=Math.atan2(dy,dx);drip.style.setProperty('--dx',`${(Math.cos(ang)*clamped*.5).toFixed(1)}px`);drip.style.setProperty('--dy',`${(Math.sin(ang)*clamped*.5).toFixed(1)}px`);drip.style.setProperty('--ds',Math.max(floor,Math.min(1,amount*1.4)).toFixed(2))}};
   if(hoverCapable){card.addEventListener('pointermove',e=>{const r=card.getBoundingClientRect();setTilt3D(card,((e.clientX-r.left)/r.width-.5)*2,((e.clientY-r.top)/r.height-.5)*2);pullWithin(e.clientX,e.clientY,110,0)},{signal});card.addEventListener('pointerleave',()=>{setTilt3D(card,0,0);release()},{signal})}
   if(!reduced.matches){card.addEventListener('touchstart',e=>{card.classList.add('is-pressed');const t=e.touches[0];if(t)pullWithin(t.clientX,t.clientY,150,.35)},{signal,passive:true});card.addEventListener('touchend',release,{signal});card.addEventListener('touchcancel',release,{signal})}
