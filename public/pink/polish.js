@@ -23,10 +23,13 @@ for(const [i,name]of ['sasaki-saku','makaino-ririmu','shiina-yuika'].entries()){
 }
 // One scheduled update touches only three portrait layers, never the whole page.
 let depthFrame=0,depthX=0,depthY=0;
-function paintDepth(){depthFrame=0;characters.forEach(el=>{const front=el.classList.contains('selected'),strength=front?13:5;el.querySelector('.portrait').style.transform=`translate3d(${depthX*strength}px,${depthY*strength*.5}px,0) rotateY(${depthX*(front?2:1)}deg)`;});}
+function paintDepth(){depthFrame=0;characters.forEach(el=>{const front=el.classList.contains('selected'),strength=front?18:8;el.querySelector('.portrait').style.transform=`translate3d(${depthX*strength}px,${depthY*strength*.5}px,0) rotateY(${depthX*(front?2:1)}deg)`;});}
 poster.addEventListener('pointermove',e=>{if(e.pointerType!=='mouse'||paused||reduced.matches||e.buttons)return;depthX=e.clientX/innerWidth*2-1;depthY=e.clientY/innerHeight*2-1;if(!depthFrame)depthFrame=requestAnimationFrame(paintDepth);});
 function clearDepth(){depthX=depthY=0;cancelAnimationFrame(depthFrame);paintDepth();}
 poster.addEventListener('pointerleave',clearDepth);$('#motion').addEventListener('click',clearDepth);reduced.addEventListener('change',clearDepth);document.addEventListener('visibilitychange',clearDepth);
+let tiltBase=null,tiltFrame=0;
+function applyTilt(beta,gamma){if(paused||reduced.matches)return;if(tiltBase===null)tiltBase=beta||0;depthX=Math.max(-1,Math.min(1,(gamma||0)/24));depthY=Math.max(-1,Math.min(1,((beta||0)-tiltBase)/24));if(!depthFrame)depthFrame=requestAnimationFrame(paintDepth);}
+if('DeviceOrientationEvent' in window)document.addEventListener('touchstart',function start(){document.removeEventListener('touchstart',start);const attach=()=>window.addEventListener('deviceorientation',e=>{if(tiltFrame)return;tiltFrame=requestAnimationFrame(()=>{applyTilt(e.beta,e.gamma);tiltFrame=0;});});if(typeof DeviceOrientationEvent.requestPermission==='function'){DeviceOrientationEvent.requestPermission().then(perm=>{if(perm==='granted')attach();}).catch(()=>{});}else attach();},{passive:true});
 document.addEventListener('characterchange',()=>{clearDepth();if(dynamic()){balls.forEach((b,i)=>{b.vx+=(i%2?1:-1)*110;b.vy-=80;squash(b,160);});wakeBalls();}});
 // A double tap sends nearby charms away from its origin, like touching a spring field.
 poster.addEventListener('dblclick',e=>{if(e.target.closest('.chrome,.toy')||!dynamic())return;balls.forEach(b=>{const dx=b.x-e.clientX,dy=b.y-e.clientY,d=Math.max(40,Math.hypot(dx,dy));b.vx+=dx/d*600;b.vy+=dy/d*600;squash(b,280);});wakeBalls();burst(e.clientX,e.clientY);geometryButton.click();});

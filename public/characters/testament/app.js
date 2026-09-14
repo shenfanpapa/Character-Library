@@ -16,8 +16,11 @@
  toggle.addEventListener('click',()=>{if(!drag)setOpen(!open);drag=false});
  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&open)setOpen(false);if(e.key.toLowerCase()==='p'&&!e.repeat){userPaused=!userPaused;updatePause()}});
  document.addEventListener('visibilitychange',updatePause);
- stage.addEventListener('pointermove',e=>{if(e.pointerType==='touch'||reduced.matches||open||raf)return;const x=e.clientX,y=e.clientY;raf=requestAnimationFrame(()=>{const r=stage.getBoundingClientRect();stage.style.setProperty('--px',((x-r.left)/r.width-.5)*10+'px');stage.style.setProperty('--py',((y-r.top)/r.height-.5)*8+'px');raf=0})});
+ stage.addEventListener('pointermove',e=>{if(e.pointerType==='touch'||reduced.matches||open||raf)return;const x=e.clientX,y=e.clientY;raf=requestAnimationFrame(()=>{const r=stage.getBoundingClientRect();stage.style.setProperty('--px',((x-r.left)/r.width-.5)*15+'px');stage.style.setProperty('--py',((y-r.top)/r.height-.5)*12+'px');raf=0})});
  stage.addEventListener('pointerleave',()=>{stage.style.setProperty('--px','0px');stage.style.setProperty('--py','0px')});
+ let tiltBase=null,tiltRaf=0;
+ function applyTilt(beta,gamma){if(reduced.matches||open)return;if(tiltBase===null)tiltBase=beta||0;const gx=Math.max(-24,Math.min(24,gamma||0)),by=Math.max(-24,Math.min(24,(beta||0)-tiltBase));stage.style.setProperty('--px',(gx*.5).toFixed(1)+'px');stage.style.setProperty('--py',(by*.42).toFixed(1)+'px')}
+ if('DeviceOrientationEvent' in window)document.addEventListener('touchstart',function start(){document.removeEventListener('touchstart',start);const attach=()=>window.addEventListener('deviceorientation',e=>{if(tiltRaf)return;tiltRaf=requestAnimationFrame(()=>{applyTilt(e.beta,e.gamma);tiltRaf=0})});if(typeof DeviceOrientationEvent.requestPermission==='function'){DeviceOrientationEvent.requestPermission().then(state=>{if(state==='granted')attach()}).catch(()=>{})}else attach()},{passive:true});
  let frame=null,manifest=null;
  function resize(){if(frame&&manifest){const r=art.getBoundingClientRect(),w=manifest.width,h=manifest.height,scale=Math.min(r.width/w,r.height/h);frame.style.width=(w*scale)+'px';frame.style.height=(h*scale)+'px'}if(open){stage.style.minHeight=(innerWidth<=700?Math.max(1300,680+dossier.scrollHeight+105):Math.max(780,Math.ceil((dossier.scrollHeight+100)/.68)))+'px'}else stage.style.minHeight=''}
  async function initialize(){
