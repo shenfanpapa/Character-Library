@@ -12,6 +12,8 @@
 
 非分区文件（部署与校验）：`server.mjs`、`scripts/check.mjs`、`Dockerfile`、`railway.toml`、`package.json`。
 
+各页面现在采用的风格、界面功能清单和未来规划记录在 [`docs/style-features-roadmap.md`](docs/style-features-roadmap.md)。改动风格或功能后同步更新那份文档。
+
 ## 隔离靠什么成立
 
 外壳用 `<iframe>` 装载每个作品（`library.js` 的 `bindViewer`）。角色页和 PINK 各自是独立文档，**CSS 和 JS 不会互相污染，也不会漏进外壳**。所以「改 PINK 的样式会不会影响构成主义」这类担心，在样式和脚本层面不成立。
