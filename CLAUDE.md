@@ -6,7 +6,7 @@
 
 | 区 | 目录 | 内容 |
 | --- | --- | --- |
-| **作品库**（外壳） | `public/index.html`、`public/library.js`、`public/library.css`、`public/mark.svg`、`public/covers/` | 首页、Archive 列表页、作品导航「目录」浮层、路由、封面图 |
+| **作品库**（外壳） | `public/index.html`、`public/library.js`、`public/library.css`、`public/mark.svg`、`public/covers/` | 首页、Archive 列表页、PINK 分区页、作品导航「目录」浮层、进入首页和分区时的加载动画、路由、封面图 |
 | **构成主义**（Archive） | `public/characters/**` | 六个角色页：deepseek、noir、teru、testament、afterglow、tomo |
 | **PINK** | `public/pink/**` | PINK NOISE 互动海报，完全自成一体 |
 
@@ -35,12 +35,15 @@
 2. `server.mjs` — `shellRoutes` 里的 key 列表（决定 `/archive/<id>/` 是否可路由）
 3. `scripts/check.mjs` — `keys` 数组（决定校验覆盖哪些路由）
 
-另外首页和 Archive 列表的图片都用 `public/covers/` 里的 WebP，外壳不直接引用其他区的图片。这些 WebP 由其他区的原图转成（quality 92，尺寸与原图相同）：
+PINK 的两个地址同样在这三处出现：`/pink/` 是外壳里的 PINK 分区页，`/pink/noise/` 才装载海报本体 `public/pink/index.html`。改这两个地址时，同步 `library.js` 的 `route()`、`server.mjs` 的 `shellRoutes` 和 `scripts/check.mjs` 的路由列表。
+
+另外首页、Archive 列表和 PINK 分区页的图片都用 `public/covers/` 里的 WebP，外壳不直接引用其他区的图片。这些 WebP 由其他区的原图转成（quality 92，尺寸与原图相同）：
 
 - `deepseek`、`noir`、`teru` ← `public/characters/<id>/cover.png`
 - `testament` ← `public/characters/testament/assets/body-weapon.webp`
 - `afterglow`、`tomo` ← `public/characters/<id>/assets/a-master.webp`
 - `pink-<名字>` ← `public/pink/assets/<名字>-original.png`
+- `pink-charm-heart`、`pink-charm-star`、`pink-charm-patch` ← `public/pink/assets/charm-<名字>.png`
 
 **换了这些原图或新增角色时，要重新生成对应的 `public/covers/*.webp`**；新增角色还要让 `works[].image` 指向新文件。
 
@@ -50,7 +53,7 @@
 npm run check
 ```
 
-会起服务器，校验全部路由、每个静态资源、HTML 里的每条引用、健康检查与缓存行为。目前 144 项。
+会起服务器，校验全部路由、每个静态资源、HTML 里的每条引用、健康检查与缓存行为。目前 148 项。
 
 注意它**查不到**两类引用：`library.js` 模板字符串里的图片路径，和 ES module 的 `import`。动过这两类东西，要在浏览器里实际打开受影响的页面确认。
 

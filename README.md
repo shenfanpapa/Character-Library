@@ -34,7 +34,8 @@ docs/             设计说明与角色来源
 | `/archive/testament/` | TESTAMENT |
 | `/archive/afterglow/` | AFTERGLOW |
 | `/archive/tomo/` | TOMO |
-| `/pink/` | PINK NOISE |
+| `/pink/` | PINK 分区（地雷系） |
+| `/pink/noise/` | PINK NOISE 互动海报 |
 
 旧版 `/#tomo` 等角色书签会自动转到对应地址。
 

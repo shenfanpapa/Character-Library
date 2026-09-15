@@ -10,7 +10,7 @@ let stderr='';child.stderr.on('data',data=>stderr+=data);
 try{
  const origin=await new Promise((resolve,reject)=>{const timeout=setTimeout(()=>reject(Error('Server startup timed out')),15000);child.stdout.on('data',data=>{const match=data.toString().match(/READY (http:\/\/localhost:\d+)/);if(match){clearTimeout(timeout);resolve(match[1])}});child.on('error',reject);child.on('exit',code=>{clearTimeout(timeout);reject(Error(`Server exited ${code}: ${stderr}`))})});
  const keys=['deepseek','noir','teru','testament','afterglow','tomo'];
- for(const path of ['/','/archive/','/pink/',...keys.map(k=>`/archive/${k}/`)]){const r=await fetch(origin+path);assert.equal(r.status,200,path);assert.match(await r.text(),/library\.js/,path);checks++}
+ for(const path of ['/','/archive/','/pink/','/pink/noise/',...keys.map(k=>`/archive/${k}/`)]){const r=await fetch(origin+path);assert.equal(r.status,200,path);assert.match(await r.text(),/library\.js/,path);checks++}
  for(const file of await walk(publicRoot)){
   const path='/'+decodeURIComponent(file.href.slice(publicRoot.href.length));
   const r=await fetch(origin+encodeURI(path),{method:'HEAD'});assert.equal(r.status,200,path);assert(Number(r.headers.get('content-length'))>0,path);checks++;
