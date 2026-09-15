@@ -6,7 +6,7 @@
 
 | 区 | 目录 | 内容 |
 | --- | --- | --- |
-| **作品库**（外壳） | `public/index.html`、`public/library.js`、`public/library.css`、`public/mark.svg` | 首页、Archive 列表页、作品导航「目录」浮层、路由 |
+| **作品库**（外壳） | `public/index.html`、`public/library.js`、`public/library.css`、`public/mark.svg`、`public/covers/` | 首页、Archive 列表页、作品导航「目录」浮层、路由、封面图 |
 | **构成主义**（Archive） | `public/characters/**` | 六个角色页：deepseek、noir、teru、testament、afterglow、tomo |
 | **PINK** | `public/pink/**` | PINK NOISE 互动海报，完全自成一体 |
 
@@ -35,7 +35,14 @@
 2. `server.mjs` — `shellRoutes` 里的 key 列表（决定 `/archive/<id>/` 是否可路由）
 3. `scripts/check.mjs` — `keys` 数组（决定校验覆盖哪些路由）
 
-另外 `library.js` 的 `works[].image` 指向构成主义区里的封面文件（`public/characters/<id>/cover.png` 或该角色 `assets/` 里的图）。**删角色素材前先查这里**。
+另外首页和 Archive 列表的图片都用 `public/covers/` 里的 WebP，外壳不直接引用其他区的图片。这些 WebP 由其他区的原图转成（quality 92，尺寸与原图相同）：
+
+- `deepseek`、`noir`、`teru` ← `public/characters/<id>/cover.png`
+- `testament` ← `public/characters/testament/assets/body-weapon.webp`
+- `afterglow`、`tomo` ← `public/characters/<id>/assets/a-master.webp`
+- `pink-<名字>` ← `public/pink/assets/<名字>-original.png`
+
+**换了这些原图或新增角色时，要重新生成对应的 `public/covers/*.webp`**；新增角色还要让 `works[].image` 指向新文件。
 
 ## 改完必须跑
 
@@ -43,7 +50,7 @@
 npm run check
 ```
 
-会起服务器，校验全部路由、每个静态资源、HTML 里的每条引用、健康检查与缓存行为。目前 135 项。
+会起服务器，校验全部路由、每个静态资源、HTML 里的每条引用、健康检查与缓存行为。目前 144 项。
 
 注意它**查不到**两类引用：`library.js` 模板字符串里的图片路径，和 ES module 的 `import`。动过这两类东西，要在浏览器里实际打开受影响的页面确认。
 
