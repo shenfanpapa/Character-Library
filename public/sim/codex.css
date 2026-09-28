@@ -1,0 +1,169 @@
+/* SIM · 菲欧拉人物图鉴 —— 羊皮纸古书为主体，协会公告栏的照片、红章、便签为点缀，整体做旧。 */
+:root{color-scheme:light;
+  --paper:#e6dcc3;--ink:#352b21;--ink-soft:#7a6a52;
+  --gilt:#b08a42;--gilt-hi:#e6c779;--rubric:#8a2f26;--seal:#a8342b;--navy:#34425f;--note:#efe3a0;
+  --grain:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .35 0 0 0 0 .25 0 0 0 0 .12 0 0 0 .55 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  --scuff:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.03 .06' numOctaves='4' seed='7' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .8 0 0 0 0 .75 0 0 0 0 .6 0 0 0 .22 -.06'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+*{box-sizing:border-box}
+html,body{background:#9d8761}
+body{color:var(--ink);font:15px/1.75 "Noto Serif SC",serif}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible{outline:2px solid var(--gilt-hi);outline-offset:3px}
+img{max-width:100%;display:block}
+
+/* ---------- 桌面与书皮：羊皮纸 ---------- */
+.desk{padding-inline:16px;padding-block:26px 50px;min-height:100vh;
+  background:var(--grain),var(--scuff),radial-gradient(ellipse at 50% 25%,#cdb991,#9a845d 78%)}
+.wrap{max-width:1180px;margin:0 auto;display:grid;gap:22px}
+.title{text-align:center}
+.title small{font:12px "Cinzel",serif;letter-spacing:.4em;color:#6b5634}
+.title h1{margin:2px 0 0;font:900 clamp(26px,4vw,38px)/1.25 "Noto Serif SC",serif;letter-spacing:.24em;
+  background:linear-gradient(100deg,#5e4119 0%,#a07a34 22%,#6b4c1f 38%,#9c7632 58%,#553a16 80%,#8e6a2c 100%);-webkit-background-clip:text;background-clip:text;color:transparent;
+  filter:drop-shadow(0 1px 0 rgba(255,244,215,.55))}
+
+.book{position:relative;display:grid;grid-template-columns:1fr 1fr;padding:14px;border-radius:10px 12px 12px 10px;
+  background:var(--grain),var(--scuff),linear-gradient(180deg,#d4c198,#bda67a);
+  box-shadow:0 26px 50px rgba(60,40,15,.45),inset 0 0 0 2px #a88d5e,inset 0 0 44px rgba(105,72,30,.5)}
+.book::before{content:"";position:absolute;inset:6px;border:1px solid rgba(110,78,35,.4);border-radius:8px;pointer-events:none}
+
+/* ---------- 纸页：做旧 ---------- */
+.page{position:relative;padding:30px 36px 44px;min-height:680px;isolation:isolate;
+  background:
+    radial-gradient(circle at 82% 86%,transparent 34px,rgba(120,78,28,.16) 36px,rgba(120,78,28,.05) 41px,transparent 43px),
+    radial-gradient(ellipse at 12% 8%,rgba(150,105,45,.22),transparent 38%),
+    radial-gradient(ellipse at 95% 60%,rgba(140,95,40,.14),transparent 30%),
+    radial-gradient(circle at 30% 70%,rgba(130,90,40,.10) 0 2px,transparent 3px),
+    radial-gradient(circle at 64% 22%,rgba(130,90,40,.12) 0 1.5px,transparent 2.5px),
+    radial-gradient(circle at 71% 48%,rgba(130,90,40,.10) 0 2.5px,transparent 3.5px),
+    var(--paper);
+  box-shadow:inset 0 0 70px rgba(115,80,30,.38)}
+.page::after{content:"";position:absolute;inset:0;background:var(--grain);opacity:.55;mix-blend-mode:multiply;pointer-events:none;z-index:5}
+.page.l{border-radius:3px 0 0 3px;box-shadow:inset 0 0 70px rgba(115,80,30,.38),inset -26px 0 34px -18px rgba(60,40,15,.55)}
+.page.r{border-radius:0 3px 3px 0;box-shadow:inset 0 0 70px rgba(115,80,30,.38),inset 26px 0 34px -18px rgba(60,40,15,.55)}
+.run{display:flex;justify-content:space-between;font:italic 500 15px "Cormorant Garamond",serif;color:var(--ink-soft);border-bottom:1px solid rgba(53,43,33,.25);padding-bottom:4px;margin-bottom:18px}
+.folio{position:absolute;bottom:14px;left:0;right:0;text-align:center;font:italic 500 15px "Cormorant Garamond",serif;color:var(--ink-soft)}
+
+/* 左页：贴上去的照片 */
+.photo{position:relative;margin:10px auto 0;width:min(100%,400px);background:#f1ead8;padding:14px 14px 12px;transform:rotate(-1.2deg);
+  box-shadow:0 1px 1px rgba(0,0,0,.15),0 8px 14px rgba(70,45,15,.28)}
+.photo::before{content:"";position:absolute;inset:0;background:var(--grain);opacity:.35;mix-blend-mode:multiply;pointer-events:none}
+.photo-in{height:420px;display:flex;align-items:flex-end;justify-content:center;
+  background:radial-gradient(ellipse at 50% 40%,#f6efdc,#d9cba8 90%);box-shadow:inset 0 0 30px rgba(110,80,35,.35)}
+.photo-in img{max-height:400px;width:auto;filter:sepia(.28) saturate(.85) contrast(.96)}
+.corner{position:absolute;width:30px;height:30px;background:#3b2c1f;opacity:.88}
+.corner.tl{top:-4px;left:-4px;clip-path:polygon(0 0,100% 0,0 100%)}
+.corner.tr{top:-4px;right:-4px;clip-path:polygon(0 0,100% 0,100% 100%)}
+.corner.bl{bottom:-4px;left:-4px;clip-path:polygon(0 0,100% 100%,0 100%)}
+.corner.br{bottom:-4px;right:-4px;clip-path:polygon(100% 0,100% 100%,0 100%)}
+.tape{position:absolute;width:86px;height:24px;background:rgba(232,221,184,.72);box-shadow:0 1px 2px rgba(0,0,0,.14);z-index:2;
+  -webkit-mask:linear-gradient(90deg,transparent 0 2px,#000 2px calc(100% - 2px),transparent 0);mask:linear-gradient(90deg,transparent 0 2px,#000 2px calc(100% - 2px),transparent 0)}
+.plate{text-align:center;margin-top:22px}
+.plate small{font:12px "Cinzel",serif;letter-spacing:.32em;color:var(--rubric)}
+.plate h2{margin:2px 0 0;font:900 38px/1.2 "Noto Serif SC",serif;letter-spacing:.22em;color:#2c231a}
+.plate p{margin:0;font:italic 500 18px "Cormorant Garamond",serif;color:var(--ink-soft)}
+.regno{position:absolute;top:66px;left:24px;font:13px "IM Fell English SC",serif;color:var(--navy);transform:rotate(-90deg);transform-origin:left top;letter-spacing:.2em;opacity:.7}
+
+/* 右页 */
+.sec{margin-bottom:16px;position:relative}
+.sec h3{margin:0 0 6px;font:700 12.5px "Cinzel",serif;letter-spacing:.32em;color:var(--rubric);display:flex;align-items:center;gap:10px}
+.sec h3::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,var(--gilt),transparent)}
+.fields{display:grid;grid-template-columns:auto minmax(0,1fr);gap:0 14px;margin:0;font-size:14px;max-width:calc(100% - 96px)}
+.fields dt{color:var(--navy);font-size:12px;letter-spacing:.18em;padding-top:5px}
+.fields dd{margin:0;border-bottom:1px dotted rgba(53,43,33,.4);padding:3px 0}
+.prose{margin:0;font-size:14.5px;line-height:1.9;max-width:60ch}
+.stamp{position:absolute;top:58px;right:30px;width:92px;height:92px;border-radius:50%;border:3px double var(--seal);color:var(--seal);display:grid;place-items:center;text-align:center;
+  font:400 22px/1.05 "ZCOOL XiaoWei",serif;transform:rotate(-14deg);opacity:.78;mix-blend-mode:multiply;z-index:3;
+  -webkit-mask-image:radial-gradient(circle at 72% 28%,rgba(0,0,0,.35) 0 16%,#000 42%);mask-image:radial-gradient(circle at 72% 28%,rgba(0,0,0,.35) 0 16%,#000 42%)}
+.stamp small{display:block;font:8px "IM Fell English SC",serif;letter-spacing:.12em;margin-top:3px}
+.memo{position:relative;margin:12px 0 4px 18px;max-width:420px;background:#f1e9d2;padding:14px 16px 12px;transform:rotate(1.1deg);
+  background-image:repeating-linear-gradient(transparent 0 27px,rgba(52,66,95,.16) 27px 28px);box-shadow:0 6px 12px rgba(70,45,15,.25)}
+.memo::before{content:"";position:absolute;inset:0;background:var(--grain);opacity:.4;mix-blend-mode:multiply}
+.memo b{display:block;font:400 13px "ZCOOL XiaoWei",serif;color:var(--navy);letter-spacing:.2em}
+.memo p{margin:0;font:21px/1.35 "Long Cang",cursive;color:#2f3b57}
+.memo .tape{top:-12px;left:40%;transform:rotate(-3deg)}
+.virtus{display:grid;grid-template-columns:190px minmax(0,1fr);gap:16px;align-items:center}
+.virtus svg{width:100%;height:auto}
+.bless{position:relative;background:var(--note);padding:12px 14px;transform:rotate(-1.3deg);box-shadow:0 5px 10px rgba(70,45,15,.25)}
+.bless::before{content:"";position:absolute;inset:0;background:var(--grain);opacity:.45;mix-blend-mode:multiply}
+.bless .pin{position:absolute;top:-7px;left:50%;width:14px;height:14px;margin-left:-7px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff8,transparent 45%),#9b2f27;box-shadow:0 2px 2px rgba(0,0,0,.4)}
+.bless b{font:400 18px "ZCOOL XiaoWei",serif;color:#5a2a18}
+.bless p{margin:2px 0 0;font-size:13.5px}
+.hpmp{font-size:13px;margin-top:10px;color:var(--ink-soft);font-variant-numeric:tabular-nums}
+.skills{list-style:none;margin:0;padding:0;columns:2;column-gap:24px;font-size:14px}
+.skills li{break-inside:avoid;display:flex;justify-content:space-between;gap:8px;border-bottom:1px dotted rgba(53,43,33,.3);padding:3px 0}
+.skills i{font-style:normal;color:var(--seal);letter-spacing:1px;opacity:.85}
+.turn{animation:turn .55s cubic-bezier(.2,.7,.2,1)}
+@keyframes turn{from{opacity:0;transform:perspective(1400px) rotateY(-14deg);transform-origin:left center}}
+
+/* 索引：按住所分组、钉在桌面上的旧照片 */
+.index{display:flex;gap:14px;overflow-x:auto;padding:14px 6px 12px;justify-content:safe center}
+.snap{flex:none;position:relative;border:0;width:74px;padding:5px 5px 18px;background:#efe6cf;transform:rotate(var(--r));box-shadow:0 4px 8px rgba(60,40,15,.35);transition:transform .2s}
+.snap::before{content:"";position:absolute;top:-6px;left:50%;width:11px;height:11px;margin-left:-5.5px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff9,transparent 45%),var(--pin);box-shadow:0 2px 2px rgba(0,0,0,.5);z-index:1}
+.snap img{aspect-ratio:1;width:100%;object-fit:cover;filter:sepia(.6) saturate(.6) brightness(.95);transition:filter .2s}
+.snap span{position:absolute;left:0;right:0;bottom:1px;font:12px/16px "ZCOOL XiaoWei",serif;text-align:center;color:#3b2f22}
+.snap:hover{transform:rotate(0) translateY(-3px)}
+.snap:hover img,.snap[aria-current=true] img{filter:sepia(.15)}
+.snap[aria-current=true]{transform:rotate(0) translateY(-5px) scale(1.06);box-shadow:0 0 0 2px var(--gilt-hi),0 8px 14px rgba(0,0,0,.5)}
+
+
+/* 书签：概要 / 各份记录 */
+.tabs{display:flex;flex-wrap:wrap;gap:4px 6px;margin:-8px 0 16px;padding-right:0}
+.tab{border:0;background:rgba(138,47,38,.08);color:var(--ink-soft);font:13px/1 "Noto Serif SC",serif;letter-spacing:.12em;padding:7px 10px 8px;border-radius:0 0 3px 3px;
+  box-shadow:inset 0 2px 0 rgba(138,47,38,.35)}
+.tab:hover{color:var(--rubric)}
+.tab[aria-selected=true]{background:var(--rubric);color:#f6ecd6;box-shadow:0 3px 6px rgba(90,30,20,.3)}
+.page.r.has-tabs .stamp{top:104px}
+.doc{font-size:14.5px;line-height:1.85;max-width:62ch}
+.doc h4{margin:18px 0 6px;font:700 12.5px "Cinzel","Noto Serif SC",serif;letter-spacing:.3em;color:var(--rubric);display:flex;align-items:center;gap:10px}
+.doc h4::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,var(--gilt),transparent)}
+.doc h4:first-child{margin-top:0}
+.doc h5,.doc h6{margin:14px 0 4px;font-size:14px;color:var(--navy);letter-spacing:.1em}
+.doc p{margin:0 0 10px}
+.doc ul,.doc ol{margin:0 0 10px;padding-left:1.3em}
+.doc li{margin:2px 0}
+.doc li.sub{margin-left:1.2em;list-style:circle}
+.doc li::marker{color:var(--rubric)}
+.doc b{font-weight:600;color:#2a2118}
+.doc a{color:var(--rubric);text-decoration:underline dotted;text-underline-offset:3px}
+.doc a:hover{text-decoration-style:solid}
+.doc blockquote{margin:0 0 10px;padding:4px 12px;border-left:2px solid var(--gilt);color:var(--ink-soft)}
+.doc pre{margin:0 0 12px;padding:10px 12px;background:rgba(122,90,40,.08);border:1px dashed rgba(122,90,40,.35);font:13px/1.6 ui-monospace,"Noto Sans Mono CJK SC",monospace;overflow-x:auto}
+.doc code{font:13px ui-monospace,monospace;background:rgba(122,90,40,.1);padding:0 4px}
+.md-table{overflow-x:auto;margin:0 0 12px}
+.doc table{border-collapse:collapse;width:100%;font-size:13.5px}
+.doc th{text-align:left;font-weight:600;color:var(--navy);letter-spacing:.1em;border-bottom:1.5px solid rgba(52,66,95,.5);padding:4px 10px 4px 0;white-space:nowrap}
+.doc td{border-bottom:1px dotted rgba(53,43,33,.35);padding:5px 10px 5px 0;vertical-align:top}
+.empty{color:var(--ink-soft);font-style:italic}
+
+/* 还没有立绘 */
+.photo-in .sketch{align-self:center;text-align:center;font:italic 500 18px "Cormorant Garamond","Noto Serif SC",serif;color:var(--ink-soft)}
+.photo-in .sketch b{display:block;font:400 16px "ZCOOL XiaoWei",serif;letter-spacing:.3em;margin-top:6px}
+.snap .none{display:grid;place-items:center;aspect-ratio:1;background:#d9cba8;color:#7a6a52;font:20px "ZCOOL XiaoWei",serif}
+
+/* 索引分组 */
+.index{align-items:flex-end}
+.group{flex:none;display:flex;gap:14px;align-items:flex-end;padding-top:16px;position:relative}
+.group+.group{margin-left:14px;padding-left:22px;border-left:1px dashed rgba(70,50,20,.35)}
+.group>small{position:absolute;top:-8px;left:0;font:12px "ZCOOL XiaoWei",serif;letter-spacing:.14em;color:#4e3d25;white-space:nowrap}
+.group+.group>small{left:22px}
+
+@media (max-width:960px){
+  .book{grid-template-columns:1fr}
+  .page.l,.page.r{border-radius:3px;min-height:0}
+  .page.l{margin-bottom:10px}
+}
+@media (max-width:620px){
+  .desk{padding-block:78px 40px}
+  .page.r.has-tabs .stamp{top:auto}
+  .page{padding:22px 18px 44px}
+  .photo-in{height:330px}.photo-in img{max-height:310px}
+  .regno{display:none}
+  .fields{max-width:100%}
+  .stamp{position:relative;top:auto;right:auto;margin:-6px 0 10px auto;width:74px;height:74px;font-size:17px}
+  .virtus{grid-template-columns:1fr}
+  .virtus svg{max-width:240px;margin:0 auto}
+  .skills{columns:1}
+  .memo{margin-left:0}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}

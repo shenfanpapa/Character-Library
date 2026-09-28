@@ -1,0 +1,53 @@
+# 每小时从 SIM 仓库取最新设定，重新生成 public/sim/ 的图鉴数据和立绘；
+# 有变化且 npm run check 通过时，提交到 main（Railway 随后自动部署）。
+name: 同步 SIM
+
+on:
+  schedule:
+    - cron: '17 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sync-sim
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: 取 SIM 仓库
+        uses: actions/checkout@v4
+        with:
+          repository: shenfanpapa/SIM
+          path: .sim-src
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: 生成图鉴
+        run: npm run build:sim -- .sim-src
+
+      - name: 有变化才校验并提交
+        run: |
+          if [ -z "$(git status --porcelain -- public/sim public/covers)" ]; then
+            echo "SIM 没有变化"
+            exit 0
+          fi
+          npm run check
+          sha=$(git -C .sim-src rev-parse --short HEAD)
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add public/sim public/covers
+          git commit -m "同步 SIM（${sha}）"
+          git push

@@ -5,9 +5,13 @@
   "type": "module",
   "scripts": {
     "start": "node server.mjs",
-    "check": "node scripts/check.mjs"
+    "check": "node scripts/check.mjs",
+    "build:sim": "node scripts/build-sim.mjs"
   },
   "engines": {
     "node": ">=22"
+  },
+  "devDependencies": {
+    "sharp": "^0.35.5"
   }
 }

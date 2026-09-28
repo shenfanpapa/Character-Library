@@ -10,13 +10,14 @@ let stderr='';child.stderr.on('data',data=>stderr+=data);
 try{
  const origin=await new Promise((resolve,reject)=>{const timeout=setTimeout(()=>reject(Error('Server startup timed out')),15000);child.stdout.on('data',data=>{const match=data.toString().match(/READY (http:\/\/localhost:\d+)/);if(match){clearTimeout(timeout);resolve(match[1])}});child.on('error',reject);child.on('exit',code=>{clearTimeout(timeout);reject(Error(`Server exited ${code}: ${stderr}`))})});
  const keys=['deepseek','noir','teru','testament','afterglow','tomo'];
- for(const path of ['/','/archive/','/pink/','/pink/noise/','/holo/','/holo/teru/',...keys.map(k=>`/archive/${k}/`)]){const r=await fetch(origin+path);assert.equal(r.status,200,path);assert.match(await r.text(),/library\.js/,path);checks++}
+ for(const path of ['/','/archive/','/pink/','/pink/noise/','/sim/','/sim/codex/','/holo/','/holo/teru/',...keys.map(k=>`/archive/${k}/`)]){const r=await fetch(origin+path);assert.equal(r.status,200,path);assert.match(await r.text(),/library\.js/,path);checks++}
  for(const file of await walk(publicRoot)){
   const path='/'+decodeURIComponent(file.href.slice(publicRoot.href.length));
   const r=await fetch(origin+encodeURI(path),{method:'HEAD'});assert.equal(r.status,200,path);assert(Number(r.headers.get('content-length'))>0,path);checks++;
   if(!path.endsWith('.html'))continue;
   const html=await readFile(file,'utf8');for(const [,src]of html.matchAll(/(?:src|href)="([^"]+)"/g)){if(/^(data:|https?:|#|mailto:)/.test(src))continue;const url=new URL(src,origin+path);const response=await fetch(url,{method:'HEAD'});assert.equal(response.status,200,url.href);checks++}
  }
+ const sim={};new Function('window',await readFile(new URL('sim/data.js',publicRoot),'utf8'))(sim);assert(sim.SIM_DATA?.chars?.length,'SIM data is empty');for(const c of sim.SIM_DATA.chars){assert(c.name,'SIM character without name');for(const src of [c.img,c.bust].filter(Boolean)){const r=await fetch(origin+'/sim/'+src,{method:'HEAD'});assert.equal(r.status,200,'/sim/'+src);checks++}}
  const health=await fetch(origin+'/healthz');assert.equal((await health.json()).status,'ok');checks++;
  assert.equal((await fetch(origin+'/missing-work/')).status,404);checks++;
  assert.equal((await fetch(origin+'/library.css',{method:'POST'})).status,405);checks++;
