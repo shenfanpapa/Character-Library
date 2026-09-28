@@ -1,0 +1,9 @@
+{
+  "name": "holo-card-build",
+  "private": true,
+  "type": "module",
+  "description": "Build-only: bundles holo/app.js with three.js into public/holo/app.js. Not a runtime dependency.",
+  "devDependencies": {
+    "three": "0.180.0"
+  }
+}

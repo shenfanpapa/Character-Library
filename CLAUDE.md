@@ -1,15 +1,16 @@
 # WORKS · 作品库 — 分区边界
 
-本项目分四个**互不相干的区**。收到「改 X」的需求时，只改 X 区的文件，不要顺手动其他区。
+本项目分五个**互不相干的区**。收到「改 X」的需求时，只改 X 区的文件，不要顺手动其他区。
 
-## 四个区
+## 五个区
 
 | 区 | 目录 | 内容 |
 | --- | --- | --- |
-| **作品库**（外壳） | `public/index.html`、`public/library.js`、`public/library.css`、`public/mark.svg`、`public/covers/` | 首页、Archive 列表页、PINK 分区页、作品导航「目录」浮层、进入首页和分区时的加载动画、路由、封面图 |
+| **作品库**（外壳） | `public/index.html`、`public/library.js`、`public/library.css`、`public/mark.svg`、`public/covers/` | 首页、Archive 列表页、PINK 分区页、SIM 分区页、STAR PARTY 分区页、作品导航「目录」浮层、进入首页和分区时的加载动画、路由、封面图 |
 | **构成主义**（Archive） | `public/characters/**` | 六个角色页：deepseek、noir、teru、testament、afterglow、tomo |
 | **PINK** | `public/pink/**` | PINK NOISE 互动海报，完全自成一体 |
 | **SIM** | `public/sim/**` | 菲欧拉人物图鉴，资料来自 SIM 仓库（见下文「SIM 同步」） |
+| **STAR PARTY** | `public/holo/**`（源码 `holo/`） | TERU 吉星派对全息闪卡（three.js），完全自成一体 |
 
 非分区文件（部署、校验与同步）：`server.mjs`、`scripts/check.mjs`、`scripts/build-sim.mjs`、`.github/workflows/sync-sim.yml`、`Dockerfile`、`railway.toml`、`package.json`、`package-lock.json`。
 
@@ -30,6 +31,10 @@
 
 只改一个角色，就只动 `public/characters/<角色>/` 里的文件，不要动 `_shared/`。
 
+## STAR PARTY 区：改源码要重新打包
+
+`public/holo/app.js` 是打包产物（three.js 已内联，一个文件）。要改卡片逻辑，改 `holo/app.js`，再运行 `holo/build.sh`（需要 bun 或 npx esbuild，首次会在 `holo/` 里装 three）。网站本身仍然不需要 `npm install`。卡片素材在 `public/holo/cards/<id>/`，模型 `public/holo/assets/card.glb`（服务器已登记 `.glb` 类型）。
+
 ## 已知的跨文件接缝
 
 新增或删除角色时，角色 id 列表在三处出现，必须同步：
@@ -38,7 +43,7 @@
 2. `server.mjs` — `shellRoutes` 里的 key 列表（决定 `/archive/<id>/` 是否可路由）
 3. `scripts/check.mjs` — `keys` 数组（决定校验覆盖哪些路由）
 
-PINK 的两个地址同样在这三处出现：`/pink/` 是外壳里的 PINK 分区页，`/pink/noise/` 才装载海报本体 `public/pink/index.html`。SIM 同理：`/sim/` 是分区页，`/sim/codex/` 装载图鉴本体 `public/sim/index.html`。改这些地址时，同步 `library.js` 的 `route()`、`server.mjs` 的 `shellRoutes` 和 `scripts/check.mjs` 的路由列表。
+PINK 的两个地址同样在这三处出现：`/pink/` 是外壳里的 PINK 分区页，`/pink/noise/` 才装载海报本体 `public/pink/index.html`。SIM 同理：`/sim/` 是分区页，`/sim/codex/` 装载图鉴本体 `public/sim/index.html`。STAR PARTY 也一样：`/holo/` 是分区页，`/holo/teru/` 装载卡片本体 `public/holo/index.html`（`library.js` 的 `zoneWorks` 记录 iframe 作品）。改这些地址时，同步 `library.js` 的 `route()`、`server.mjs` 的 `shellRoutes` 和 `scripts/check.mjs` 的路由列表。
 
 另外首页、Archive 列表和 PINK 分区页的图片都用 `public/covers/` 里的 WebP，外壳不直接引用其他区的图片。这些 WebP 由其他区的原图转成（quality 92，尺寸与原图相同）：
 
@@ -48,6 +53,7 @@ PINK 的两个地址同样在这三处出现：`/pink/` 是外壳里的 PINK 分
 - `pink-<名字>` ← `public/pink/assets/<名字>-original.png`
 - `pink-charm-heart`、`pink-charm-star`、`pink-charm-patch` ← `public/pink/assets/charm-<名字>.png`
 - `sim-1`、`sim-2`、`sim-3` ← 由 `scripts/build-sim.mjs` 从 SIM 仓库的图鉴标准版立绘生成（裁到人物、高度不超过 1400、quality 92），人选见脚本里的 `COVER_PICKS`，不要手动替换
+- `holo-<卡>`（miko、parasol、nurse、idol）← `public/holo/cards/<卡>/` 的 `background.webp` + `subject.webp` + `text.webp` 依次叠合（卡片正面原画，不含镭射）
 
 **换了这些原图或新增角色时，要重新生成对应的 `public/covers/*.webp`**；新增角色还要让 `works[].image` 指向新文件。
 
@@ -68,7 +74,7 @@ SIM 区的资料来自另一个仓库 [shenfanpapa/SIM](https://github.com/shenf
 npm run check
 ```
 
-会起服务器，校验全部路由、每个静态资源、HTML 里的每条引用、SIM 数据里的每张立绘、健康检查与缓存行为。目前 225 项，随 SIM 人物数变化。
+会起服务器，校验全部路由、每个静态资源、HTML 里的每条引用、SIM 数据里的每张立绘、健康检查与缓存行为。目前 258 项，随 SIM 人物数变化。
 
 注意它**查不到**两类引用：`library.js` 模板字符串里的图片路径，和 ES module 的 `import`。动过这两类东西，要在浏览器里实际打开受影响的页面确认。
 
