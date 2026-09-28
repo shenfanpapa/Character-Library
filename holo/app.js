@@ -16,7 +16,6 @@ const asset = (id, name) => `./cards/${id}/${name}.webp`;
 const PARAMS = { scale: 1, depth: 0, fxDepth: 0.8, bgDepth: -0.4, foil: 0.52 };
 const FINISH = { pearl: 0, silver: 1, original: 2, gold: 3 };
 const FINISH_NAME = { pearl: "珠光", silver: "银箔", gold: "烫金", original: "原画" };
-const BACKGROUND = "#f3f0ff";
 
 const $ = (id) => document.getElementById(id);
 const stage = $("stage");
@@ -162,7 +161,8 @@ function addShadow() {
   scene.add(shadow);
 }
 function createRenderer() {
-  const options = { antialias: true, alpha: false };
+  // 画布透明，露出页面的菱格底。
+  const options = { antialias: true, alpha: true, premultipliedAlpha: false };
   try {
     return new THREE.WebGLRenderer({ ...options, powerPreference: "high-performance" });
   } catch {
@@ -183,7 +183,7 @@ async function init() {
     startFallback(first, error);
     return;
   }
-  renderer.setClearColor(BACKGROUND, 1);
+  renderer.setClearColor(0x000000, 0);
   renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.NoToneMapping;

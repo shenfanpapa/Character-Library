@@ -54,6 +54,8 @@ PINK 的两个地址同样在这三处出现：`/pink/` 是外壳里的 PINK 分
 - `pink-charm-heart`、`pink-charm-star`、`pink-charm-patch` ← `public/pink/assets/charm-<名字>.png`
 - `sim-1`、`sim-2`、`sim-3` ← 由 `scripts/build-sim.mjs` 从 SIM 仓库的图鉴标准版立绘生成（裁到人物、高度不超过 1400、quality 92），人选见脚本里的 `COVER_PICKS`，不要手动替换
 - `holo-<卡>`（miko、parasol、nurse、idol）← `public/holo/cards/<卡>/` 的 `background.webp` + `subject.webp` + `text.webp` 依次叠合（卡片正面原画，不含镭射）
+- `holo-stk-miko`、`holo-stk-nurse`（贴纸角色）← `public/holo/cards/<卡>/subject.webp`，透明度按 190 硬切（去掉半透明光效）后裁边
+- `holo-px-<卡>`（像素头像，PNG）← `public/holo/cards/<卡>/subject.webp` 头部裁切，缩到 26×26、14 色，加 1px 深色描边；页面用 `image-rendering: pixelated` 放大
 
 **换了这些原图或新增角色时，要重新生成对应的 `public/covers/*.webp`**；新增角色还要让 `works[].image` 指向新文件。
 
