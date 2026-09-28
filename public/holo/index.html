@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+    <meta name="theme-color" content="#f3f0ff" />
+    <link rel="icon" href="data:," />
+    <title>照 · 三神御主 | 吉星派对全息闪卡</title>
+    <link rel="stylesheet" href="./style.css" />
+    <script type="module" src="./app.js"></script>
+  </head>
+  <body>
+    <main>
+      <div class="stage" id="stage" tabindex="0" role="group" aria-label="可旋转的全息卡片（拖动倾斜，F 键翻面，空格键开关摇摆）">
+        <div id="loading" class="loading" role="status">
+          <span class="loading-die" aria-hidden="true"></span><span>洗牌中…</span>
+        </div>
+        <p class="stage-note" aria-hidden="true"><span>吉星派对 · TERU</span><span id="card-name">01 / 三神御主</span></p>
+        <p class="intro" aria-hidden="true"><span class="intro-ready">READY?</span><span class="intro-go">PARTY!</span></p>
+      </div>
+      <div class="controls">
+        <div class="card-picker" role="group" aria-label="选择卡片">
+          <button data-card="miko" aria-pressed="true" disabled>01 巫女</button
+          ><button data-card="parasol" aria-pressed="false" disabled>02 蓝伞</button
+          ><button data-card="nurse" aria-pressed="false" disabled>03 护士</button
+          ><button data-card="idol" aria-pressed="false" disabled>04 歌姬</button>
+        </div>
+        <div class="face-picker" role="group" aria-label="卡片朝向">
+          <button id="front" aria-pressed="true" disabled>正面</button
+          ><button id="back" aria-pressed="false" disabled>背面</button>
+        </div>
+        <div class="finish" role="group" aria-label="卡面材质">
+          <button class="swatch pearl" data-finish="pearl" aria-pressed="false" aria-label="珠光" title="珠光" disabled></button
+          ><button class="swatch silver" data-finish="silver" aria-pressed="false" aria-label="银箔" title="银箔" disabled></button
+          ><button class="swatch gold" data-finish="gold" aria-pressed="true" aria-label="烫金" title="烫金" disabled></button
+          ><button class="swatch original" data-finish="original" aria-pressed="false" aria-label="原画" title="原画" disabled></button>
+          <span id="finish-name">烫金</span>
+        </div>
+      </div>
+    </main>
+    <div id="notice" role="status" class="notice" hidden></div>
+  </body>
+</html>

@@ -2,7 +2,7 @@ import http from 'node:http';
 import { readFileSync, readdirSync } from 'node:fs';
 import { gzipSync } from 'node:zlib';
 import { createHash } from 'node:crypto';
-const types={html:'text/html; charset=utf-8',css:'text/css; charset=utf-8',js:'text/javascript; charset=utf-8',png:'image/png',webp:'image/webp',jpg:'image/jpeg',svg:'image/svg+xml',woff2:'font/woff2'};
+const types={html:'text/html; charset=utf-8',css:'text/css; charset=utf-8',js:'text/javascript; charset=utf-8',png:'image/png',webp:'image/webp',jpg:'image/jpeg',svg:'image/svg+xml',woff2:'font/woff2',glb:'model/gltf-binary'};
 const files=new Map(),root=new URL('./public/',import.meta.url);
 function collect(dir=''){
  for(const entry of readdirSync(new URL(dir,root),{withFileTypes:true})){
@@ -20,7 +20,7 @@ const server=http.createServer((req,res)=>{
  if(req.method!=='GET'&&!head){res.writeHead(405,{Allow:'GET, HEAD'});return res.end('Method not allowed')}
  let pathname;try{pathname=decodeURIComponent((req.url||'/').split(/[?#]/,1)[0])}catch{res.writeHead(400);return res.end(head?undefined:'Bad request')}
  if(pathname==='/healthz'){res.writeHead(200,{'Content-Type':'application/json'});return res.end(head?undefined:'{"status":"ok"}')}
- const shellRoutes=new Set(['/archive/','/archive','/pink/','/pink','/pink/noise/','/pink/noise',...['deepseek','noir','teru','testament','afterglow','tomo'].flatMap(key=>['/archive/'+key,'/archive/'+key+'/'])]);
+ const shellRoutes=new Set(['/archive/','/archive','/pink/','/pink','/pink/noise/','/pink/noise','/holo/','/holo','/holo/teru/','/holo/teru',...['deepseek','noir','teru','testament','afterglow','tomo'].flatMap(key=>['/archive/'+key,'/archive/'+key+'/'])]);
  const file=files.get(shellRoutes.has(pathname)?'/index.html':pathname);if(!file){res.writeHead(404,{'Content-Type':'text/plain'});return res.end(head?undefined:'Not found')}
  const gzip=!!file.gz&&acceptsGzip(req.headers['accept-encoding']),body=gzip?file.gz:file.raw,etag='"'+file.digest+(gzip?'-gzip':'')+'"';res.setHeader('Content-Type',file.type);res.setHeader('ETag',etag);res.setHeader('Vary','Accept-Encoding');
  if((req.headers['if-none-match']||'').split(',').some(s=>s.trim().replace(/^W\//,'')===etag||s.trim()==='*')){res.writeHead(304);return res.end()}

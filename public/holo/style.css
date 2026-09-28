@@ -1,0 +1,418 @@
+/* TERU · 吉星派对全息闪卡 —— 只保留卡片与三组控制。界面按吉星派对的派对游戏风格：高饱和撞色、粗描边、按下去的游戏按钮、棋盘格边。 */
+:root {
+  color-scheme: light;
+  --paper: #f3f0ff;
+  --ink: #2b0b4f;
+  --muted: #665078;
+  --yellow: #ffe83a;
+  --pink: #ff2e88;
+  --cyan: #16d3f5;
+  --accent: #cd076e;
+  --focus: #7914de;
+  font-family: "Helvetica Neue", "PingFang SC", "Microsoft YaHei", sans-serif;
+  color: var(--ink);
+  background: var(--paper);
+  font-synthesis: none;
+}
+* {
+  box-sizing: border-box;
+}
+html,
+body {
+  height: 100%;
+}
+body {
+  margin: 0;
+  min-width: 320px;
+  overflow: hidden;
+  background: var(--paper);
+}
+button {
+  font: inherit;
+  color: inherit;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+button:disabled {
+  opacity: 0.4;
+  cursor: wait;
+}
+button:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 4px;
+}
+[hidden] {
+  display: none !important;
+}
+main {
+  height: 100%;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+}
+
+/* ---- 卡片舞台 ---- */
+.stage {
+  position: relative;
+  overflow: hidden;
+  background: repeating-conic-gradient(from 0deg at 50% 55%, #e9e2ff 0 8deg, transparent 8deg 18deg), var(--paper);
+  cursor: grab;
+  touch-action: none;
+  outline-offset: -4px;
+}
+.stage.dragging {
+  cursor: grabbing;
+}
+.stage canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.stage-note {
+  z-index: 2;
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  margin: 0;
+  display: flex;
+  gap: 8px;
+  pointer-events: none;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1px;
+}
+.stage-note span {
+  background: var(--yellow);
+  border: 2px solid var(--ink);
+  border-radius: 8px;
+  padding: 6px 10px;
+  box-shadow: 3px 3px 0 var(--ink);
+}
+.stage-note span + span {
+  background: #fff;
+}
+/* 开场字样：READY? → PARTY! */
+.intro {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  margin: 0;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+  font: 900 clamp(44px, 11vw, 120px) / 1 "Arial Black", "Helvetica Neue", "Microsoft YaHei", sans-serif;
+  letter-spacing: -0.02em;
+  color: var(--yellow);
+  -webkit-text-stroke: 3px var(--ink);
+  text-shadow: 6px 7px 0 var(--pink);
+}
+.intro span {
+  grid-area: 1 / 1;
+  opacity: 0;
+}
+.intro-go {
+  color: var(--pink);
+  text-shadow: 6px 7px 0 var(--yellow);
+}
+.is-intro .intro-ready {
+  animation: stamp 0.34s 0.15s cubic-bezier(0.3, 1.8, 0.5, 1) both, gone 0.2s 0.75s forwards;
+}
+.is-intro .intro-go {
+  animation: stamp 0.34s 0.8s cubic-bezier(0.3, 1.8, 0.5, 1) both, gone 0.4s 1.45s forwards;
+}
+@keyframes stamp {
+  from {
+    opacity: 0;
+    transform: scale(2.3) rotate(-12deg);
+  }
+  to {
+    opacity: 1;
+    transform: rotate(-4deg);
+  }
+}
+@keyframes gone {
+  to {
+    opacity: 0;
+    transform: rotate(-4deg) scale(0.9);
+  }
+}
+.loading {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  font-size: 12px;
+  color: var(--muted);
+  white-space: pre-line;
+  text-align: center;
+  padding: 24px;
+}
+.loading {
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  color: var(--ink);
+}
+.loading-die {
+  width: 46px;
+  height: 46px;
+  border: 3px solid var(--ink);
+  border-radius: 11px;
+  box-shadow: 3px 4px 0 var(--ink);
+  background: radial-gradient(circle at 26% 26%, var(--ink) 9%, transparent 10%),
+    radial-gradient(circle at 74% 26%, var(--ink) 9%, transparent 10%),
+    radial-gradient(circle at 50% 50%, var(--pink) 11%, transparent 12%),
+    radial-gradient(circle at 26% 74%, var(--ink) 9%, transparent 10%),
+    radial-gradient(circle at 74% 74%, var(--ink) 9%, transparent 10%), #fff;
+  animation: loading 0.9s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+}
+.loading.error {
+  color: var(--accent);
+}
+.loading.error button {
+  border-bottom: 1px solid currentColor;
+  padding: 6px;
+}
+@keyframes loading {
+  0% {
+    transform: translateY(0) rotate(0);
+  }
+  50% {
+    transform: translateY(-18px) rotate(180deg);
+  }
+  100% {
+    transform: translateY(0) rotate(360deg);
+  }
+}
+
+/* ---- 控制条：卡片 / 朝向 / 材质 ---- */
+.controls {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 12px 22px;
+  padding: 24px 18px calc(16px + env(safe-area-inset-bottom));
+  background: var(--ink);
+}
+/* 棋盘格边：像派对棋盘的格子 */
+.controls::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 10px;
+  background: conic-gradient(var(--yellow) 25%, var(--pink) 0 50%, var(--yellow) 0 75%, var(--pink) 0) 0 0 / 20px 20px;
+  border-bottom: 2px solid #000;
+}
+.card-picker,
+.face-picker {
+  display: flex;
+  gap: 8px;
+}
+/* 游戏按钮：粗描边 + 底部厚边，按下时下沉 */
+.card-picker button,
+.face-picker button {
+  padding: 8px 13px 7px;
+  font-size: 13px;
+  font-weight: 900;
+  white-space: nowrap;
+  background: #fff;
+  color: var(--ink);
+  border: 2px solid #000;
+  border-radius: 10px;
+  box-shadow: 0 4px 0 #000;
+  transition: transform 0.12s, box-shadow 0.12s, background 0.15s;
+}
+.card-picker button:hover:not(:disabled),
+.face-picker button:hover:not(:disabled) {
+  background: var(--cyan);
+}
+.card-picker button:active:not(:disabled),
+.face-picker button:active:not(:disabled),
+.card-picker button[aria-pressed="true"],
+.face-picker button[aria-pressed="true"] {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 #000;
+}
+.card-picker button[aria-pressed="true"] {
+  background: var(--pink);
+  color: #fff;
+}
+.face-picker button[aria-pressed="true"] {
+  background: var(--yellow);
+}
+.finish {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.swatch {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  position: relative;
+  border: 2px solid #000;
+  box-shadow: 0 3px 0 #000;
+}
+.swatch[aria-pressed="true"]::after {
+  content: "";
+  position: absolute;
+  inset: -6px;
+  border: 2px solid var(--yellow);
+  border-radius: 50%;
+}
+.swatch.pearl {
+  background: conic-gradient(from 30deg, #e5edef, #ecebd6, #eddae1, #dce9ed, #e5edef);
+}
+.swatch.silver {
+  background: linear-gradient(135deg, #c3c6c4, #fff 44%, #b4b9b6);
+}
+.swatch.gold {
+  background: linear-gradient(135deg, #8a5a1c, #e8c468 46%, #6f4a12);
+}
+.swatch.original {
+  background: #fff;
+}
+#finish-name {
+  min-width: 2.5em;
+  font-size: 13px;
+  font-weight: 900;
+  color: var(--yellow);
+}
+.notice {
+  position: fixed;
+  top: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--ink);
+  color: #fff;
+  padding: 12px 20px;
+  border-radius: 6px;
+  font-size: 12px;
+  z-index: 30;
+  max-width: calc(100% - 32px);
+  text-align: center;
+}
+
+/* ---- 无 WebGL 时的 CSS-3D 卡片 ---- */
+.fallback3d {
+  position: absolute;
+  inset: 0;
+  perspective: 1000px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 26px 40px;
+}
+.flipper3d {
+  position: relative;
+  height: 100%;
+  aspect-ratio: 2 / 3;
+  max-width: 100%;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+.card3d {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+.face3d {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  box-shadow: 0 30px 60px -22px rgba(36, 38, 37, 0.4), 0 6px 14px rgba(36, 38, 37, 0.14);
+}
+.layer3d {
+  position: absolute;
+  inset: 0;
+}
+.layer3d img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.foil3d {
+  position: absolute;
+  inset: 0;
+  transform: translateZ(0);
+  pointer-events: none;
+  opacity: var(--foil-amount, 0.6);
+}
+.foil3d::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(55% 40% at var(--mx, 50%) var(--my, 45%), rgba(255, 238, 190, 0.65), transparent 70%);
+  mix-blend-mode: screen;
+}
+.finish-gold .foil3d {
+  background: linear-gradient(118deg, rgba(230, 180, 80, 0.55), rgba(201, 162, 74, 0.18) 45%, rgba(255, 244, 210, 0.12) 70%);
+  mix-blend-mode: overlay;
+}
+.finish-silver .foil3d {
+  background: linear-gradient(118deg, rgba(210, 214, 220, 0.5), rgba(180, 186, 192, 0.16) 45%, rgba(245, 248, 252, 0.14) 70%);
+  mix-blend-mode: soft-light;
+}
+.finish-pearl .foil3d {
+  background: linear-gradient(118deg, rgba(255, 255, 255, 0.4), rgba(200, 205, 215, 0.12) 50%, rgba(255, 255, 255, 0.3) 75%);
+  mix-blend-mode: soft-light;
+}
+.finish-original .foil3d {
+  display: none;
+}
+.back3d {
+  transform: rotateY(180deg);
+}
+
+@media (max-width: 640px) {
+  .stage-note {
+    top: 14px;
+    right: 12px;
+  }
+  .stage-note span:first-child {
+    display: none;
+  }
+  .controls {
+    gap: 12px 14px;
+    padding: 20px 8px calc(12px + env(safe-area-inset-bottom));
+  }
+  .card-picker,
+  .face-picker {
+    gap: 5px;
+  }
+  .card-picker button,
+  .face-picker button {
+    padding: 7px 8px 6px;
+    font-size: 12px;
+  }
+  .fallback3d {
+    padding: 18px 22px;
+  }
+  .flipper3d {
+    width: 100%;
+    height: auto;
+    max-height: 100%;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .loading-die {
+    animation: none;
+  }
+}
